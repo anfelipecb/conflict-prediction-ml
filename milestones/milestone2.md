@@ -16,3 +16,12 @@ This is also a good time to start your final report. For Milestone 6 (the final 
 To complete Milestone 2 create a file named milestones/milestone2.md in your group repository. Write a short sentence with a new formulation of your research question and whether you had to change your proposal. In a new paragraph, write 100-200 words about your dataset, where you found it, what features you plan on using, the new feature you plan on extracting, etc. 
 
 Upload the contents of your repo to the "Project Milestone 2" assignment on Gradescope. Milestone 2 is due 04/17 at 11:59pm. 
+
+- Collect data:
+    
+    - Find at least one dataset
+    - Print or plot basic statistics
+    - Think about how to clean the dataset. Are there missing values? Correct types?
+    - 300-500 examples at least.
+    - Think Features to train the model. At least 3-5 features.
+    - Extract one additional feature.
