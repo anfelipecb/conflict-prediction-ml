@@ -1,3 +1,32 @@
+
+#### New research question
+
+We decided to change our question research because last one had been done, so a new research about it wouldn't had added significant value to the topic (prediction of probability of a kid being underdeveloped).
+
+After exploring and looking for data, we are going to predict the probability of a conflict happening in Africa according to a certain geographic polygon given the climate stress that the region es living due to climate change. In simple words: predict if a conflict is going to happen in a certain location of Africa according to weather and sociodemographic conditions.
+
+# Pablo, AQUÍ TIENES QUE TOMAR LA BASE DE DATOS QUE SE LLAMA "AFRICA_DATA" Y HACERTE DOS GRÁFICOS:
+#   1. GRÁFICO DE LÍNEA QUE MUESTRE EL NÚMERO DE CONFLICTOS A LO LARGO DEL TIEMPO EN AFRICA
+#   2. GRÁFICO DE BARRAS DE PAÍSES CON LOS PAÍSES QUE REPRESENTAN EL 80% DE ESOS CONFLICTOS.
+
+
+#### Our data for the model [CAMACHO]
+
+*Short, 1-2 max*. Answer: Which one is the dataset, where we found it, features to use, feature to be extracted.
+
+#### Plan to clean our data [AGUSTIN]
+
+
+
+
+
+
+
+To complete Milestone 2 create a file named milestones/milestone2.md in your group repository. Write a short sentence with a new formulation of your research question and whether you had to change your proposal. In a new paragraph, write 100-200 words about your dataset, where you found it, what features you plan on using, the new feature you plan on extracting, etc. 
+
+
+
+
 Milestone 2: Data exploration
 For Milestone 2, you will collect data to train your machine learning models so that you can investigate your research question. 
 
@@ -13,7 +42,7 @@ Given the data available, your initial research question might need to change. T
 
 This is also a good time to start your final report. For Milestone 6 (the final milestone) you will participate in a project fair and turn in a report that explains what you did over the course of your project. 
 
-To complete Milestone 2 create a file named milestones/milestone2.md in your group repository. Write a short sentence with a new formulation of your research question and whether you had to change your proposal. In a new paragraph, write 100-200 words about your dataset, where you found it, what features you plan on using, the new feature you plan on extracting, etc. 
+
 
 Upload the contents of your repo to the "Project Milestone 2" assignment on Gradescope. Milestone 2 is due 04/17 at 11:59pm. 
 
@@ -24,4 +53,4 @@ Upload the contents of your repo to the "Project Milestone 2" assignment on Grad
     - Think about how to clean the dataset. Are there missing values? Correct types?
     - 300-500 examples at least.
     - Think Features to train the model. At least 3-5 features.
-    - Extract one additional feature.
+    - Extract one additional feature
