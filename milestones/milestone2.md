@@ -12,9 +12,8 @@ After exploring and looking for data, we are going to predict the probability of
 
 #### Our data for the model [CAMACHO]
 
-*Short, 1-2 max*. Answer: Which one is the dataset, where we found it, features to use, feature to be extracted.
+*Short, 100-200 words*. Answer: Which one is the dataset, where we found it, features to use, feature to be extracted.
 
-#### Plan to clean our data [AGUSTIN]
 
 
 
