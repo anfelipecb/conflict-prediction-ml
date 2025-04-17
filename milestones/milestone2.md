@@ -1,7 +1,7 @@
 
 #### New project: 
 
-Conflict remains a major barrier to development, stability, and humanitarian well-being, particularly in regions affected by environmental stress and resource scarcity. Understanding and predicting the spatial and temporal dynamics of conflict events can provide critical insights for policymakers, aid organizations, and local communities to better allocate resources, anticipate humanitarian crises, and design targeted interventions. Nigeria, given its complex dynamics of resource-driven conflicts, economic inequalities, and climate-induced stress, serves as an ideal context to explore how environmental and socioeconomic factors interact and influence conflict risks.
+Conflict remains a major barrier to development, stability, and humanitarian well-being, particularly in regions affected by environmental stress and resource scarcity. Understanding and predicting the spatial and temporal dynamics of conflict events can provide critical insights for policymakers, aid organizations, and local communities to better allocate resources, anticipate humanitarian crises, and design targeted interventions. Africa, given its complex dynamics of resource-driven conflicts, economic inequalities, and climate-induced stress, serves as an ideal context to explore how environmental and socioeconomic factors interact and influence conflict risks.
 
 
 #### Description of data sources: 
@@ -14,7 +14,7 @@ Conflict remains a major barrier to development, stability, and humanitarian wel
 
 #### Methodology for data cleaning, integration and features: 
 
-For Nigeria, we aim to divide the cotinent in grids of 50km x 50km, inside of which we would count the points of conflict to classify them as 'conflict' or 'no conflict' for an specific year. Environmental and socioeconomic features from the auxiliary datasets will be aggregated within these grid cells. To enhance our feature set, we will extract two aditional features: 
+For Africa, we aim to divide the cotinent in grids of 50km x 50km, inside of which we would count the points of conflict to classify them as 'conflict' or 'no conflict' for an specific year. Environmental and socioeconomic features from the auxiliary datasets will be aggregated within these grid cells. To enhance our feature set, we will extract two aditional features: 
 
 1. the year-over-year change in nighttime light intensity, serving as a proxy for economic development or decline.
 2. the anomalies in temperature measured as temperature abnormally high or low (1 std deviation from long term trend)
