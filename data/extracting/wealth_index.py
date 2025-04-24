@@ -65,5 +65,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    df = pd.read_parquet("data/extracted/wealth_index.parquet")
-    print(df.head)
