@@ -58,8 +58,12 @@ def main():
                 df = concatenates_df(df, csv_df)
                 counter += 1
     print(f"countries added: {counter}")
-    df.to_csv("data/extracted/wealth_index_africa.csv", index=False)
+    df.to_parquet("data/extracted/wealth_index.parquet", index=False)
+
+
     
 
 if __name__ == "__main__":
     main()
+    df = pd.read_parquet("data/extracted/wealth_index.parquet")
+    print(df.head)
