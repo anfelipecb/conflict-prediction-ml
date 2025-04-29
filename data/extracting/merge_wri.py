@@ -29,6 +29,7 @@ def main():
 
     # Save to file
     polygons_gdf.to_file("data/output/africa_with_rwi.geojson", driver="GeoJSON")
+    polygons_gdf.to_parquet("data/output/africa_with_rwi.parquet")
 
 # Run it
 main()
