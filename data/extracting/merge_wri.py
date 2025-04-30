@@ -25,7 +25,7 @@ def main():
     rwi_avg = joined.groupby('index_right')['rwi'].mean()
 
     # Assign the average RWI back to the polygons
-    polygons_gdf['rwi_2001'] = polygons_gdf.index.map(rwi_avg)
+    polygons_gdf['rwi_2021'] = polygons_gdf.index.map(rwi_avg)
 
     # Save to file
     polygons_gdf.to_file("data/output/africa_with_rwi.geojson", driver="GeoJSON")
