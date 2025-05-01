@@ -79,8 +79,8 @@ def main():
     points_asset = "projects/climate-effects-453719/assets/conflict_africa/Africa_points"
     grid_asset = "projects/climate-effects-453719/assets/conflict_africa/Africa_grid"
     
-   # Upload schools data
-    print("\n=== Uploading Schools Data ===")
+   # Upload points data
+    print("\n=== Uploading points Data ===")
     try:
         upload_geojson_to_ee(str(points_geojson), points_asset)
         print("\n✅ Grid points data uploaded successfully!")
