@@ -26,9 +26,10 @@ def main():
 
     # Assign the average RWI back to the polygons
     polygons_gdf['rwi_2021'] = polygons_gdf.index.map(rwi_avg)
+    polygons_gdf = polygons_gdf[["GEOID", "rwi_2021"]]
 
     # Save to file
-    polygons_gdf.to_file("data/output/africa_with_rwi.geojson", driver="GeoJSON")
+    polygons_gdf.to_csv("data/output/africa_with_rwi.csv", index=False)
     polygons_gdf.to_parquet("data/output/africa_with_rwi.parquet")
 
 # Run it
