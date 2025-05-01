@@ -1,4 +1,4 @@
-## Milestone 3: Training our model [general context: Agustín, Labels and variables: Pablo]
+## Milestone 3: Training our model
 
 Conflict remains a major barrier to development, stability, and humanitarian well-being, particularly in regions affected by environmental stress and resource scarcity. Understanding and predicting the spatial and temporal dynamics of conflict events can provide critical insights for policymakers, aid organizations, and local communities to better allocate resources, anticipate humanitarian crises, and design targeted interventions. 
 
@@ -19,7 +19,9 @@ The methodology of the model is explained in the following paragraphs.
 
 #### Q2: Which regularization term did you pick? Why did you pick that regularizer for your model? [Agustín]
 
-##**Answer Here**
+Preliminary, we are using the Ridge regularizer because as it was explained before, we have variables which are highly correlated (light_sum and light_mean). Taking that into consideration, L2 manages better this kind of variables because it distributes the weights of it so each one can contribute in some way to the model. If we were using L1, the model could eliminate one variable when it has highly correlated variables.
+
+For the purpose of the assignment, and to have the best accuracy and the best recall, we are going to test the model using L2, L1 and also a elastic net (mix of both). After checking them all, we'll decide which one suites better to the purpose of our research question.
 ---
 
 #### Q3: How do you plan on describing your linear model and its output? What do small or large weights mean? [Camacho] 
