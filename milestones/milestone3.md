@@ -30,13 +30,11 @@ As it was explained before, the model predicts the ocurrence/not ocurrence of co
 
 The model works as it follows:
 
-$\[
-\text{logit}(P(Y=1)) = \beta_0 + \beta_1 \cdot \text{conflict\_count} + \beta_2 \cdot \text{temp\_mean} + \beta_3 \cdot \text{temp\_max} + \beta_4 \cdot \text{precip\_total} 
-\]
-\[
-+ \beta_5 \cdot \text{sp\_mean} + \beta_6 \cdot \text{rwi\_2021} + \beta_7 \cdot \text{forest\_loss} + \beta_8 \cdot \text{lights\_mean}
-+ \beta_9 \cdot \text{lights\_sum} + \beta_{10} \cdot \text{accumulated\_conflicts} + \beta_{11} \cdot \text{temp\_deviation}
-\]$
+$\begin{align*}
+\text{logit}(P(Y=1)) =\ & \beta_0 + \beta_1 \cdot \text{conflict\_count} + \beta_2 \cdot \text{temp\_mean} + \beta_3 \cdot \text{temp\_max} \\
+& + \beta_4 \cdot \text{precip\_total} + \beta_5 \cdot \text{sp\_mean} + \beta_6 \cdot \text{rwi\_2021} + \beta_7 \cdot \text{forest\_loss} \\
+& + \beta_8 \cdot \text{lights\_mean} + \beta_9 \cdot \text{lights\_sum} + \beta_{10} \cdot \text{accumulated\_conflicts} + \beta_{11} \cdot \text{temp\_deviation}
+\end{align*}$
 
 
 ---
