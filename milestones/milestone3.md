@@ -22,6 +22,7 @@ The methodology of the model is explained in the following paragraphs.
 Preliminary, we are using the Ridge regularizer because as it was explained before, we have variables which are highly correlated (light_sum and light_mean). Taking that into consideration, L2 manages better this kind of variables because it distributes the weights of it so each one can contribute in some way to the model. If we were using L1, the model could eliminate one variable when it has highly correlated variables.
 
 For the purpose of the assignment, and to have the best accuracy and the best recall, we are going to test the model using L2, L1 and also a elastic net (mix of both). After checking them all, we'll decide which one suites better to the purpose of our research question.
+
 ---
 
 #### Q3: How do you plan on describing your linear model and its output? What do small or large weights mean?
@@ -30,12 +31,7 @@ As it was explained before, the model predicts the ocurrence/not ocurrence of co
 
 The model works as it follows:
 
-$\begin{align*}
-\text{logit}(P(Y=1)) =\ & \beta_0 + \beta_1 \cdot \text{conflict\_count} + \beta_2 \cdot \text{temp\_mean} + \beta_3 \cdot \text{temp\_max} \\
-& + \beta_4 \cdot \text{precip\_total} + \beta_5 \cdot \text{sp\_mean} + \beta_6 \cdot \text{rwi\_2021} + \beta_7 \cdot \text{forest\_loss} \\
-& + \beta_8 \cdot \text{lights\_mean} + \beta_9 \cdot \text{lights\_sum} + \beta_{10} \cdot \text{accumulated\_conflicts} + \beta_{11} \cdot \text{temp\_deviation}
-\end{align*}$
-
+X = 
 
 ---
 
