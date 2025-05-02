@@ -27,11 +27,9 @@ For the purpose of the assignment, and to have the best accuracy and the best re
 
 #### Q3: How do you plan on describing your linear model and its output? What do small or large weights mean?
 
-As it was explained before, the model predicts the ocurrence/not ocurrence of conflict based on climatologic and socodemographic variables in a certain 50x50km polygon in Africa.
+As it was explained before, the model predicts the ocurrence/not ocurrence of conflict based on climatologic and socodemographic variables in a certain 50x50km polygon in Africa. For further detail go to Q1.
 
-The model works as it follows:
-
-X = 
+About the weights size in a logistic regression, we can point out that smaller weights mean less importance of the feature if and only if all features are in the same scale. If that's not the case, then the weight size cannot be interpreted as a sign of feature relevance because weights can be small due to features with big magnitudes. The same logic applies to big weights.
 
 ---
 
