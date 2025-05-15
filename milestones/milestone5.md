@@ -1,4 +1,4 @@
-## Milestone 5: Training our model
+## Milestone 5: Training our model with non-linear models
 
 First of all, we want you to remember our research question: 
 
