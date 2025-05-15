@@ -1,22 +1,20 @@
-## Milestone 5: Training our model with non-linear models
+## Milestone 5: Implementing Non-Linear Models
 
-First of all, we want you to remember our research question: 
+Our project seeks to answer the following research question: 
 
 **_Can the ocurrence of violence in a given geography be predicted using local socioeconomic and environmental data?_**
 
-To answer it, we are using climate data from satellite images (temperature, precipitation, light radiance, deforestation, and surface pressure) and socioeconomic indicators (Relative Wealth Index, a measure of wealth distribution) to predict the level of conflict (no conflict, low, medium, high) in specific 50x50km polygon of Africa.
+To answer this question, we are using climate data from satellite imagery (temperature, precipitation, light radiance, deforestation, and surface pressure) and socioeconomic indicators (Relative Wealth Index, a measure of wealth distribution) to predict the level of conflict (no conflict, low, medium, high)[^1] in specific 50x50km polygon of Africa.
 
-For this specific milestone, we are proposing our work guidelines to train non linear models. Specifically, we are developing three non-linear models to check which one performs better when predicting the level of conflict in 50x50km African grids using the mentioned attributes. The models to be trained are:
+For this specific milestone, we have begun developing three non linear models to check which of them performs better when predicting the level of conflict based on our data and attributes. The models to be trained are:
 
 - Random Forest
 
-- KNN
+- K Nearest Neighbors
 
 - Clustering
 
-For each of this models, we will try to find the best hyperparameters that can make the model the best predictor.
-
-Finally, we will use the model that best predicts among the three of them.
+To compare outcomes across models, we also ensure that hyperparameters are tuned so that our decision is informed by the best possible predictions. We then will select the model that produces the best predictions out of the specifications considered. 
 
 ---
 
@@ -24,7 +22,7 @@ Finally, we will use the model that best predicts among the three of them.
 
 1. **Random Forest:** [AFC] [Use pros/cons]
 
-2. **KNN:** [PH] [Use pros/challenges]
+2. **K Nearest Neighbors:** Our choice for KNN as an alternative approach for prediction stems from the intuition that conflict is likely to spread across spaces and that similar geographies are likely to experience similar levels of conflict. We use a weighted KNN specification to account for potential dimensionality issues and hence give stronger predictive influence to samples that are closer in distance to the sample being analyzed. 
 
 3. **Clustering:** This model is very powerful when reducing the complex patterns of our features based on climate variables into a single cluster ID. Eventhough we learned that Clustering is for unsupervised learning, our research points that it can also be used to supervised learning, which is our case due to the multiclass labels of 'No conflict', 'Low conflict', 'Medium Conflict', 'High Conflict'.
 
@@ -59,3 +57,6 @@ Finally, we will use the model that best predicts among the three of them.
 2. **KNN:** [PH] 
 
 3. **Clustering:** As we mentioned before, the main twist here will be to use the labeled data as a decision tree node after clustering eventhough we learned that Clustering was only for unsupervised learning. We will do this by checking the most frequent label of conflict within each cluster. For it, we will have to define a method for our imbalance dataset, otherwise many non-conflict labels will be classified as with conflict.
+
+
+[^1]: We classify our label into different levels of conflict based on the distribution of counts across the data. Accordingly, we label samples with 0 when there are no conflicts, 1 when conflicts are 'low' (up to q1), 2 when conflicts are medium (between q1 and q3), and 3 when conflict are 'high' (at or above q3). 
