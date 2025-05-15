@@ -54,4 +54,8 @@ Finally, we will use the model that best predicts among the three of them.
 
 #### Q4: What twist do you plan on adding? Why do you think this will be a good addition to your model?
 
-[Here we should have one common answer]
+1. **Random Forest:** [AFC] 
+
+2. **KNN:** [PH] 
+
+3. **Clustering:** As we mentioned before, the main twist here will be to use the labeled data as a decision tree node after clustering eventhough we learned that Clustering was only for unsupervised learning. We will do this by checking the most frequent label of conflict within each cluster. For it, we will have to define a method for our imbalance dataset, otherwise many non-conflict labels will be classified as with conflict.
