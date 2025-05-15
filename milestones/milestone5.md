@@ -28,9 +28,9 @@ Finally, we will use the model that best predicts among the three of them.
 
 3. **Clustering:** This model is very powerful when reducing the complex patterns of our features based on climate variables into a single cluster ID. Eventhough we learned that Clustering is for unsupervised learning, our research points that it can also be used to supervised learning, which is our case due to the multiclass labels of 'No conflict', 'Low conflict', 'Medium Conflict', 'High Conflict'.
 
-  For it, the methodology will be to cluster based on 4 centroids considering also the labels. Finally, we will label the new data considering which 'original label' is the one   that's most present in that cluster. That way, we can regroup our data.
+   For it, the methodology will be to cluster based on 4 centroids considering also the labels. Finally, we will label the new data considering which 'original label' is the one   that's most present in that cluster. That way, we can regroup our data.
 
-  The main challenge for the Clustering model will be the selection of the initial centroids, which we will tackle using the K-means++ variation of Lloyd's algorithm.
+   The main challenge for the Clustering model will be the selection of the initial centroids, which we will tackle using the K-means++ variation of Lloyd's algorithm.
 
 
 
