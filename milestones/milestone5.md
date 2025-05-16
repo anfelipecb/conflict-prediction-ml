@@ -20,7 +20,7 @@ To compare outcomes across models, we also ensure that hyperparameters are tuned
 
 #### Q1: Which nonlinear model do you plan on implementing? Why?
 
-1. **Random Forest:** [AFC] [Use pros/cons]
+1. **Random Forest:** We've selected Random Forest as our primary nonlinear model because it excels at capturing complex relationships between environmental factors and conflict that linear models cannot detect. Random Forest provides valuable feature importance rankings, helping us identify which climate and socioeconomic variables most strongly predict conflict occurrence. The model's ensemble approach naturally resists overfitting through bootstrap sampling and averaging across multiple decision trees, while effectively handling our mixed data types and class imbalance after SMOTE application. These advantages make Random Forest particularly well-suited for understanding the multifaceted relationships between climate conditions, wealth distribution, and conflict patterns across diverse African regions.
 
 2. **K Nearest Neighbors:** Our choice for KNN as an alternative approach for prediction stems from the intuition that conflict is likely to spread across spaces and that similar geographies are likely to experience similar levels of conflict. We use a weighted KNN specification to account for potential dimensionality issues and hence give stronger predictive influence to samples that are closer in distance to the sample being analyzed. 
 
@@ -31,12 +31,11 @@ To compare outcomes across models, we also ensure that hyperparameters are tuned
    The main challenge for the Clustering model will be the selection of the initial centroids, which we will tackle using the K-means++ variation of Lloyd's algorithm.
 
 
-
 ---
 
 #### Q2: Explain how this model is nonlinear
 
-1. **Random Forest:** [AFC] 
+1. **Random Forest:** Random Forest is nonlinear because it uses decision trees that create complex, stair-step shaped boundaries rather than straight lines. While linear models can only draw a straight line to separate different classes, each tree in a Random Forest makes yes/no decisions that split the data in multiple directions. When hundreds of these trees vote together, they create intricate decision boundaries that can capture complex patterns like threshold effects (where conflict only occurs after a certain temperature) or interaction effects (where the combination of low rainfall AND high temperature increases conflict risk). This nonlinear approach allows our model to detect relationships between environmental factors and conflict that simple linear models would completely miss.
 
 2. **KNN:** [PH] 
 
@@ -47,12 +46,13 @@ To compare outcomes across models, we also ensure that hyperparameters are tuned
 #### Q3: How will you interpret the model's results?
 
 [Here we should have one common answer]
+We will interpret our models' results through multiple complementary approaches. We'll use ROC curves and AUC scores to compare model performance across Random Forest, KNN, and Clustering, which is especially valuable for our imbalanced conflict data. For Random Forest and KNN, we'll analyze feature importance to identify which environmental and socioeconomic factors best predict conflict. Partial dependence plots will help visualize how specific features like temperature extremes affect conflict probability. For Clustering, we'll examine cluster compositions to understand which environmental conditions tend to group together with different conflict levels. All models' predictions will be visualized geographically to identify spatial patterns where models perform well or struggle. We'll pay particular attention to false negatives (missed conflicts) given their serious policy implications, and validate our findings against existing literature on conflict drivers.
 
 ---
 
 #### Q4: What twist do you plan on adding? Why do you think this will be a good addition to your model?
 
-1. **Random Forest:** [AFC] 
+1. **Random Forest:** Our main twist is implementing a multiclass Random Forest that predicts not just conflict occurrence but also conflict intensity levels (none, low, medium, high). This leverages ensemble learning to combine hundreds of decision trees, which dramatically reduces overfitting, increases predictive accuracy, and provides more stable results than any single decision tree could achieve on our complex conflict prediction task. We're enhancing this with grid search hyperparameter optimization focused on recall_weighted to ensure our model is sensitive to all conflict classes despite imbalance. This approach provides more nuanced predictions than standard implementations, allowing us to identify not just where conflicts might occur but also their potential severity, enabling better-targeted prevention and response strategies.
 
 2. **KNN:** [PH] 
 
