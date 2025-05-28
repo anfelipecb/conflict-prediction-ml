@@ -1,2 +1,4 @@
 # Large files
 data/ucdp/GEDEvent_v24_1.csv
+data/output/grid_conflict_climate_with_geometry.geojson
+*.geojson
