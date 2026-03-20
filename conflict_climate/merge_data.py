@@ -203,7 +203,34 @@ def main():
     result_gdf.drop(columns=['geometry']).to_parquet(project_path / "data/output/grid_conflict_climate.parquet")
     # only 2019 - 2023
     result_gdf[(result_gdf['year'] >=2019) & (result_gdf['year'] <=2023)].drop(columns=['geometry']).to_parquet(project_path / "data/output/grid_conflict_climate_2019_23.parquet")
-    
+
+    # 2. WITH geometry (for Kepler.gl visualization)
+    # Convert geometry to WKT format for parquet compatibility
+    result_gdf_viz = result_gdf.copy()
+    result_gdf_viz["geometry_wkt"] = result_gdf_viz["geometry"].apply(lambda x: x.wkt)
+
+    # Save with geometry as WKT string (no raw geometry column in parquet)
+    result_gdf_viz.drop(columns=["geometry"]).to_parquet(
+        project_path / "data/output/grid_conflict_climate_with_geometry.parquet"
+    )
+    result_gdf_viz[
+        (result_gdf_viz["year"] >= 2019) & (result_gdf_viz["year"] <= 2023)
+    ].drop(columns=["geometry"]).to_parquet(
+        project_path / "data/output/grid_conflict_climate_2019_23_with_geometry.parquet"
+    )
+
+    # 3. GeoJSON for Kepler.gl (large files — keep out of git; see .gitignore)
+    result_gdf.to_file(
+        project_path / "data/output/grid_conflict_climate_with_geometry.geojson",
+        driver="GeoJSON",
+    )
+    result_gdf[
+        (result_gdf["year"] >= 2019) & (result_gdf["year"] <= 2023)
+    ].to_file(
+        project_path / "data/output/grid_conflict_climate_2019_23_with_geometry.geojson",
+        driver="GeoJSON",
+    )
+
 
 if __name__ == "__main__":
     main()
