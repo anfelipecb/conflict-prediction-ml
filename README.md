@@ -13,7 +13,23 @@ This project investigates the predictability of violent conflict in Africa using
 
 ## Demo
 
-- **Interactive map (GitHub Pages)**: [anfelipecb.github.io/conflict-prediction-ml](https://anfelipecb.github.io/conflict-prediction-ml/) — deploys on push to `main` via GitHub Actions.
+- **Live site (GitHub Pages)**: **[https://anfelipecb.github.io/conflict-prediction-ml/](https://anfelipecb.github.io/conflict-prediction-ml/)** — same content as [`docs/index.html`](docs/index.html), deployed automatically when you push to `main`.
+
+### How GitHub Pages deployment works
+
+1. **Workflow**: [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) runs on every push to `main` (and can be run manually under **Actions → Deploy to GitHub Pages → Run workflow**).
+2. **What gets published**: The **`docs/`** folder after a short build step:
+   - Your committed static assets: `index.html`, `kepler_*.html`, `full_report.html`, etc.
+   - **Optional refresh** of `docs/input_data.geojson` and `docs/predictions.geojson` via `scripts/generate_*.py` when `data/output/` and `models/ensemble/` exist in the runner (if paths are missing, those steps are skipped with `|| true` and the site still uses the GeoJSON already in the repo).
+3. **One-time repo setup** (if the site shows 404):
+   - GitHub → **Settings → Pages**
+   - Under **Build and deployment**, set **Source** to **GitHub Actions** (not “Deploy from a branch”).
+   - After the first successful run, the public URL is **`https://<user>.github.io/<repo>/`** (for this repo: link above).
+4. **Preview locally**: Open `docs/index.html` in a browser from your machine (some features may need a local server if the browser blocks file URLs).
+
+### Git hook hint (`post-commit` / `pre-push` ignored)
+
+If Git prints *`hook was ignored because it's not set as executable`*: that is **only on your computer** and does **not** affect GitHub or Pages. To silence it: `git config set advice.ignoredHook false`, or run `chmod +x .git/hooks/post-commit` (and `pre-push`) if you intend to use those hooks.
 
 ## Large files (not in Git)
 
@@ -92,9 +108,10 @@ This project uses UV for dependency management. To reproduce the environment:
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/uchicago-capp30254-spr-25/project-aeyzaguirre-phernandezpedraz-afcamachob.git
-   cd project-aeyzaguirre-phernandezpedraz-afcamachob
+   git clone https://github.com/anfelipecb/conflict-prediction-ml.git
+   cd conflict-prediction-ml
    ```
+   *(Course classroom copy, if needed: `uchicago-capp30254-spr-25/project-aeyzaguirre-phernandezpedraz-afcamachob`.)*
 
 2. **Install UV** (if not already installed):
    ```bash
