@@ -1,0 +1,55 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install uv
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+
+      - name: Sync dependencies
+        run: uv sync
+        env:
+          UV_COMPILE_BYTECODE: 0
+
+      - name: Generate input data GeoJSON
+        run: |
+          uv run python scripts/generate_input_geojson.py \
+            --output docs/input_data.geojson || true
+
+      - name: Generate predictions GeoJSON
+        run: |
+          uv run python scripts/generate_predictions_geojson.py \
+            --output docs/predictions.geojson || true
+
+      - name: Copy full report to docs
+        run: cp milestones/milestone_6/final_doc.html docs/full_report.html
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs

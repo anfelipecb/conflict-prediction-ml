@@ -1,4 +1,28 @@
-# Large files
-data/ucdp/GEDEvent_v24_1.csv
-data/output/grid_conflict_climate_with_geometry.geojson
+# OS
 .DS_Store
+**/.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+.venv/
+venv/
+.env
+*.egg-info/
+dist/
+build/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# --- Too large for GitHub (100 MB blob limit) ---
+# UCDP GED: obtain from https://ucdp.uu.se/downloads/
+data/ucdp/GEDEvent*.csv
+
+# Full grid + geometry GeoJSON (~150 MB); regenerate from your pipeline if needed
+data/output/grid_conflict_climate_with_geometry.geojson
+
+# Random Forest joblib (~230 MB); run `uv run python scripts/train_and_save.py` locally
+models/ensemble/Random_Forest.joblib

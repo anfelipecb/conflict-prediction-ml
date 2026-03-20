@@ -11,6 +11,14 @@
 
 This project investigates the predictability of violent conflict in Africa using machine learning techniques applied to satellite-derived environmental and socioeconomic data. We analyze 50km x 50km grid cells across the African continent from 2019-2023, implementing four modeling approaches to predict binary conflict occurrence.
 
+## Demo
+
+- **Interactive map (GitHub Pages)**: [anfelipecb.github.io/conflict-prediction-ml](https://anfelipecb.github.io/conflict-prediction-ml/) — deploys on push to `main` via GitHub Actions.
+
+## Large files (not in Git)
+
+Some artifacts exceed [GitHub’s size limits](https://docs.github.com/en/repositories/working-with-files/managing-large-files/about-large-files-on-github) and are listed in `.gitignore`: the UCDP GED CSV, the largest grid GeoJSON, and the Random Forest `joblib`. Download GED from UCDP or regenerate outputs with the scripts under `scripts/` (e.g. `train_and_save.py`).
+
 ## Repository Structure
 
 ```
