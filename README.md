@@ -13,14 +13,14 @@ This project investigates the predictability of violent conflict in Africa using
 
 ## Demo
 
-Static site source lives under [`docs/`](docs/) (same HTML for every host below). Kepler.gl maps load large JSON files; the embedded viewer can take up to a minute—wait for the map.
+Static site source lives under [`docs/`](docs/) (same HTML for every host below).
 
 - **Live site (Vercel — climate-conflict-ml)**: **[https://climate-conflict-ml.vercel.app](https://climate-conflict-ml.vercel.app)** — production deploys from `main` via [`.github/workflows/deploy-vercel.yml`](.github/workflows/deploy-vercel.yml). The repo root [`vercel.json`](vercel.json) sets **`outputDirectory` to `docs`**, so the deployed site is the static files in [`docs/`](docs/) (where `index.html` lives). **One-time setup:** GitHub → **Settings → Secrets → Actions** → add **`VERCEL_TOKEN`** from [Vercel → Tokens](https://vercel.com/account/tokens). Manual deploy: from the **repository root**, run `vercel deploy --prod` (not from `docs/` alone). **If you see `404 NOT_FOUND`:** in the Vercel project → **Settings → General → Root Directory**, leave it **empty** (repository root) so `vercel.json` applies; do **not** set Root Directory to `docs` unless you remove the root `outputDirectory` pattern and point the project only at `docs/`.
 - **Live site (GitHub Pages)**: **[https://anfelipecb.github.io/conflict-prediction-ml/](https://anfelipecb.github.io/conflict-prediction-ml/)** — deployed by [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) on every push to `main`.
 
 ### Kepler predictions map (`kepler_predictions.json`)
 
-The **Predictions** tab loads [`docs/kepler_predictions.html`](docs/kepler_predictions.html) (full-bleed Kepler iframe) using [`docs/data/map/kepler_predictions.json`](docs/data/map/kepler_predictions.json). Export pipeline: `load_and_preprocess_data` → ensemble `predict` → GeoPandas join with **only** `GEOID`, `year`, `ensemble_prob`, `ensemble_pred`, and geometry (grid columns trimmed to `GEOID` + geometry). Kepler layer: **ensemble_prob**, quantile scale, ramp **#2C1E3D → #EDD1CA**. [`ensemble_predictions.geojson`](docs/data/map/ensemble_predictions.geojson) is the same attributes (large file; GitHub 100 MB limit may require LFS or omitting from Git).
+The **Predictions** tab loads [`docs/kepler_predictions.html`](docs/kepler_predictions.html) (Kepler iframe + thin PuRd ramp) using [`docs/data/map/kepler_predictions.json`](docs/data/map/kepler_predictions.json). Export pipeline: `load_and_preprocess_data` → ensemble `predict` → GeoPandas join with **only** `GEOID`, `year`, `ensemble_prob`, `ensemble_pred`, and geometry (grid trimmed to `GEOID` + geometry). Kepler layer: **ensemble_prob**, **quantile** scale, **ColorBrewer PuRd**. [`ensemble_predictions.geojson`](docs/data/map/ensemble_predictions.geojson) matches those attributes.
 
 ```bash
 uv run python scripts/export_kepler_predictions.py
@@ -33,7 +33,7 @@ Requires `data/output/grid_conflict_climate_2019_23.parquet` and `models/ensembl
 **Shareable URLs (after deploy):** On GitHub Pages, predictions-only GeoJSON is at  
 `https://<user>.github.io/<repo>/data/map/ensemble_predictions.geojson`  
 (Vercel: `https://<project>.vercel.app/data/map/ensemble_predictions.geojson`).  
-Open [kepler.gl demo](https://kepler.gl/demo), **Add data → Load from URL**, paste that link, then style by `ensemble_prob` (quantile, same ramp as above).
+Open [kepler.gl demo](https://kepler.gl/demo), **Add data → Load from URL**, paste that link, then style by `ensemble_prob` (quantile, ColorBrewer PuRd).
 
 ### How GitHub Pages deployment works
 

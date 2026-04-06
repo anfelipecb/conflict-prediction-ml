@@ -5,24 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Predictions — Kepler.gl</title>
   <style>
-    html, body { margin: 0; height: 100%; overflow: hidden; background: #1a1420; display: flex; flex-direction: column; }
-    .pred-header {
-      flex-shrink: 0;
-      font-family: system-ui, -apple-system, sans-serif;
-      font-size: 0.8125rem;
-      color: #c4b8c0;
-      padding: 0.5rem 1rem;
-      margin: 0;
-      border-bottom: 1px solid rgba(237, 209, 202, 0.12);
-      line-height: 1.4;
-      background: #2C1E3D;
-    }
-    .pred-header strong { color: #EDD1CA; font-weight: 600; }
+    html, body { margin: 0; height: 100%; overflow: hidden; background: #1a0f18; display: flex; flex-direction: column; }
     .pred-ramp {
       flex-shrink: 0;
-      height: 6px;
+      height: 5px;
       width: 100%;
-      background: linear-gradient(90deg, #2C1E3D 0%, #6d5d6f 50%, #EDD1CA 100%);
+      background: linear-gradient(
+        90deg,
+        #f1eef6 0%,
+        #d4b9da 16%,
+        #c994c7 33%,
+        #df65b0 50%,
+        #e7298a 66%,
+        #ce1256 83%,
+        #91003f 100%
+      );
     }
     #frame-wrap { flex: 1; min-height: 0; width: 100%; }
     iframe { width: 100%; height: 100%; border: 0; display: block; }
@@ -34,21 +31,17 @@
       margin: 0 auto;
       line-height: 1.6;
     }
-    .msg code { color: #EDD1CA; }
+    .msg code { color: #df65b0; }
   </style>
 </head>
 <body>
-  <p class="pred-header">
-    <strong>ensemble_prob</strong> · quantile color scale · ramp <span style="opacity:0.9">#2C1E3D</span> → <span style="opacity:0.9">#EDD1CA</span>
-    · <span style="opacity:0.75">(GeoJSON: only GEOID, year, ensemble_prob, ensemble_pred + geometry)</span>
-  </p>
-  <div class="pred-ramp" role="presentation" aria-hidden="true"></div>
+  <div class="pred-ramp" role="presentation" title="ColorBrewer PuRd · ensemble_prob (quantile)"></div>
   <div id="frame-wrap"></div>
   <script>
     (function () {
       var wrap = document.getElementById('frame-wrap');
       if (window.location.protocol === 'file:') {
-        wrap.innerHTML = '<p class="msg">Serve this folder over <code>http://</code> or <code>https://</code> (e.g. <code>python -m http.server</code> from <code>docs/</code>) so Kepler can load <code>data/map/kepler_predictions.json</code>.</p>';
+        wrap.innerHTML = '<p class="msg">Serve this folder over <code>http://</code> or <code>https://</code> so Kepler can load <code>data/map/kepler_predictions.json</code>.</p>';
         return;
       }
       var jsonUrl = new URL('data/map/kepler_predictions.json', window.location.href).href;
@@ -57,12 +50,12 @@
           if (!r.ok) throw new Error('missing');
           var iframe = document.createElement('iframe');
           iframe.src = 'https://kepler.gl/demo/map?mapUrl=' + encodeURIComponent(jsonUrl);
-          iframe.title = 'Kepler.gl — ensemble probability';
+          iframe.title = 'Kepler.gl — ensemble probability (PuRd)';
           iframe.setAttribute('loading', 'lazy');
           wrap.appendChild(iframe);
         })
         .catch(function () {
-          wrap.innerHTML = '<p class="msg">Missing <code>kepler_predictions.json</code>. Run <code>uv run python scripts/export_kepler_predictions.py</code> (needs parquet + <code>models/ensemble/</code>).</p>';
+          wrap.innerHTML = '<p class="msg">Missing <code>kepler_predictions.json</code>. Run <code>uv run python scripts/export_kepler_predictions.py</code>.</p>';
         });
     })();
   </script>

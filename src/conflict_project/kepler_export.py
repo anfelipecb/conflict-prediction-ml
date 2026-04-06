@@ -15,19 +15,19 @@ from conflict_project.config import PROJECT_ROOT
 
 SHELL_PATH = PROJECT_ROOT / "data" / "map" / "kepler_map_shell.json"
 
-# Quantile ramp: low P(conflict) → high (matches predictions viewer strip)
+# ColorBrewer PuRd (sequential): low → high ensemble_prob (quantile in Kepler)
 ENSEMBLE_COLOR_RANGE = {
-    "name": "ensemble_prob_quantile",
+    "name": "ColorBrewer_PuRd",
     "type": "sequential",
     "category": "Custom",
     "colors": [
-        "#2C1E3D",
-        "#3F2F4A",
-        "#5A4A5E",
-        "#756572",
-        "#958B88",
-        "#B8B0A8",
-        "#EDD1CA",
+        "#f1eef6",
+        "#d4b9da",
+        "#c994c7",
+        "#df65b0",
+        "#e7298a",
+        "#ce1256",
+        "#91003f",
     ],
 }
 
@@ -127,7 +127,7 @@ def build_predictions_kepler_document(gdf: gpd.GeoDataFrame, dataset_id: str = "
             **shell.get("info", {}),
             "title": "Africa 50km grid — ensemble predictions",
             "description": (
-                "ensemble_prob (quantile), colors #2C1E3D–#EDD1CA. "
+                "ensemble_prob (quantile), ColorBrewer PuRd. "
                 "Properties: GEOID, year, ensemble_prob, ensemble_pred."
             ),
         },
