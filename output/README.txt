@@ -1,5 +1,6 @@
 Figures referenced from milestones/milestone_6/final_doc.ipynb as ../../output/*.png
 The static site copies PNGs to docs/output/ so full_report.html can use paths like output/Data_Africa.png (see GitHub Actions deploy step).
+For filenames: confusion_RF.png and confusion_NN.png in this folder are symlinks to confussion_RF.png / confussion_NN.png. Export confusion_LR.png and confusion_KNN.png from the training notebooks if missing (required for notebook + LaTeX paper).
 
 Generate them by running the training EDA notebooks and saving with these filenames:
   conflicts_africa_89-23.png

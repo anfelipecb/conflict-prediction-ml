@@ -1,0 +1,235 @@
+% Publication-style paper (PDF). Build: latexmk -pdf main.tex (from this directory)
+% Figures: ../output/*.png relative to latex/
+
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{geometry}
+\geometry{margin=1in}
+
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+
+\usepackage[
+  colorlinks=true,
+  linkcolor=teal!60!black,
+  citecolor=green!50!black,
+  urlcolor=green!45!black,
+  bookmarks=true,
+]{hyperref}
+
+\usepackage[
+  backend=biber,
+  style=authoryear,
+  maxcitenames=2,
+  uniquename=init,
+]{biblatex}
+\addbibresource{references.bib}
+
+% --- Green callout boxes (related work / key papers / links) ---
+\newtcolorbox{keypapers}[1][Key references and related work]{
+  enhanced,
+  breakable,
+  colback=green!6,
+  colframe=green!45!black,
+  colbacktitle=green!16,
+  coltitle=black,
+  fonttitle=\bfseries\sffamily\small,
+  title={#1},
+  boxrule=0.9pt,
+  arc=2pt,
+  left=9pt,right=9pt,top=7pt,bottom=7pt,
+}
+
+\newtcolorbox{linkbox}{
+  enhanced,
+  colback=green!5,
+  colframe=green!40!black,
+  boxrule=0.7pt,
+  arc=2pt,
+  left=8pt,right=8pt,
+}
+
+\newcommand{\fig}[2]{%
+  \begin{center}
+    \IfFileExists{#1}{%
+      \includegraphics[width=0.92\linewidth]{#1}%
+    }{%
+      \begin{tcolorbox}[colback=yellow!8,colframe=orange!70!black,title=Missing figure]
+        \small\path{#1}\\[0.5em] #2
+      \end{tcolorbox}%
+    }%
+  \end{center}%
+}
+
+\title{\textbf{Predicting Conflict in Africa:\\[0.3em]
+\large A Machine Learning Approach Using Environmental Stressors}}
+\author{%
+  Andrés Felipe Camacho\thanks{Corresponding: \texttt{afcamachob@uchicago.edu}} \and
+  Pablo Hernández Pedraza \and
+  Agustín Eyzaguirre\\[0.8em]
+  \normalsize Masters in Computational Analysis and Public Policy (MSCAPP)\\
+  University of Chicago
+}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent
+This paper investigates the predictability of violent conflict in Africa using machine learning on satellite-derived environmental and socioeconomic data for $50\mathrm{km}\times 50\mathrm{km}$ grid cells (2019--2023). We compare logistic regression, $k$-nearest neighbors, random forest, and neural networks, trained on climate, wealth, and historical conflict features to predict binary conflict occurrence. A conservative weighted ensemble achieves approximately $72\%$ recall and $52\%$ precision on the minority (conflict) class, illustrating both the value and the precision--recall tradeoffs of early-warning style models for policy and humanitarian audiences.
+\end{abstract}
+
+\section{Introduction}
+
+Conflict remains a major barrier to development and stability, particularly where environmental stress and resource scarcity interact with inequality. Predicting where violence is more likely can help allocate aid and diplomatic attention---but models must balance catching true conflicts (recall) against false alarms (precision). Africa offers a demanding testbed: heterogeneous geography, uneven data quality, and strong class imbalance (most grid-years are non-conflict).
+
+\paragraph{Research question.}
+\textit{Can the occurrence of violence in a given geography be predicted using local socioeconomic and environmental data?}
+
+\begin{keypapers}[Key references (related forecasting \& ML for conflict)]
+\cite{hegre2024views} describe the \textbf{VIEWS} system (Uppsala/PRIO), which produces grid-level fatality forecasts using gradient-boosted trees and related methods. \cite{perry2013machines} discusses whether machine learning can support conflict prediction in policy contexts. For $k$-NN background, see the course notes in \textcite{knnlecture}.
+\end{keypapers}
+
+\section{Data and outcomes}
+
+\subsection{Sources}
+We combine: \textbf{UCDP} (georeferenced events); \textbf{ERA5} (climate); \textbf{Meta RWI} (wealth); \textbf{Hansen} forest change; \textbf{VIIRS} nighttime lights. Grid cells are $50\mathrm{km}$; labels indicate at least one conflict event in a grid-year.
+
+\subsection{Descriptive patterns}
+Figure~\ref{fig:ts} shows the time series of violent events in Africa (1989--2023); Figure~\ref{fig:cty} shows concentration across countries.
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[t]{0.48\linewidth}
+    \fig{../output/conflicts_africa_89-23.png}{Export from the EDA pipeline.}
+    \caption{Conflicts over time}
+    \label{fig:ts}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.48\linewidth}
+    \fig{../output/conflicts_africa_country.png}{}
+    \caption{Top countries}
+    \label{fig:cty}
+  \end{subfigure}
+  \caption{Descriptive conflict patterns (Africa)}
+\end{figure}
+
+\subsection{Features and sample}
+The training file has $34{,}015$ grid-year rows (2019--2023). Features include climate (temperature, precipitation, pressure), forest loss, lights, RWI, lags, and accumulated past conflict. The outcome is severely imbalanced ($\sim 92\%$ non-conflict); we use SMOTE during training for several models.
+
+\begin{figure}[H]
+  \centering
+  \fig{../output/Data_Africa.png}{}
+  \caption{Spatial view of conflict aggregation and temperature anomalies (example year).}
+  \label{fig:map}
+\end{figure}
+
+\section{Models}
+
+\subsection{Logistic regression (Elastic Net)}
+We estimate $P(y_i{=}1\mid x_i)=\sigma(w^\top x_i+b)$ with elastic-net penalty on $w$. Features are standardized; hyperparameters $(\alpha,C)$ are tuned via cross-validation. SMOTE balances the training set.
+
+\subsection{$k$-nearest neighbors}
+We classify each grid using distance-weighted majority vote over $k$ neighbors (cosine distance, $k{=}3$ in the selected specification).
+
+\subsection{Random forest}
+An ensemble of bagged trees with random feature subsets at each split; we report out-of-sample metrics and permutation-based feature importance.
+
+\subsection{Neural network}
+A small feedforward net ($64\to 32\to 1$, ReLU/sigmoid) trained with BCE and SGD.
+
+\subsection{Ensemble}
+We combine model probabilities with nonnegative weights summing to one and threshold $0.5$. The \textbf{Conservative} weighting (LR 30\%, KNN 25\%, RF 35\%, NN 10\%) balances accuracy and recall for deployment-oriented use cases.
+
+\section{Results}
+
+\subsection{Confusion matrices}
+Figures~\ref{fig:cm_lr}--\ref{fig:cm_nn} show confusion matrices for each classifier. File names \texttt{confusion\_LR.png} and \texttt{confusion\_KNN.png} should be exported from the training notebooks into \texttt{output/}; RF and NN use the repository filenames \texttt{confusion\_RF.png} and \texttt{confusion\_NN.png} (symlinked to the saved figures where spellings differ).
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[t]{0.48\linewidth}
+    \fig{../output/confusion_LR.png}{Run the logistic regression training notebook and save this name under \texttt{output/}.}
+    \caption{Logistic regression}
+    \label{fig:cm_lr}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.48\linewidth}
+    \fig{../output/confusion_KNN.png}{Run the KNN notebook and save under \texttt{output/}.}
+    \caption{$k$-NN}
+    \label{fig:cm_knn}
+  \end{subfigure}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[t]{0.48\linewidth}
+    \fig{../output/confusion_RF.png}{}
+    \caption{Random forest}
+    \label{fig:cm_rf}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.48\linewidth}
+    \fig{../output/confusion_NN.png}{}
+    \caption{Neural network}
+    \label{fig:cm_nn}
+  \end{subfigure}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \fig{../output/RF_Importance.png}{}
+  \caption{Random forest variable importance (impurity-based).}
+\end{figure}
+
+\subsection{ROC and precision--recall}
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[t]{0.48\linewidth}
+    \fig{../output/ROC_Models.png}{}
+    \caption{ROC curves}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.48\linewidth}
+    \fig{../output/Precision_Recall.png}{}
+    \caption{Precision--recall}
+  \end{subfigure}
+\end{figure}
+
+\begin{table}[H]
+  \centering
+  \small
+  \caption{Illustrative ensemble comparison (test set; see notebook for full grid).}
+  \begin{tabular}{lcccc}
+    \toprule
+    Scheme & Accuracy & Precision & Recall & F1 \\
+    \midrule
+    Conservative & 0.923 & 0.520 & 0.723 & 0.605 \\
+    RF-dominant & 0.927 & 0.540 & 0.705 & 0.611 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\section{Discussion}
+
+Grid-level conflict prediction combines genuine signal with hard tradeoffs: high recall often implies many false positives, which can erode trust among practitioners. Ensembles help but do not remove the need for domain judgment and ethical safeguards if scores inform allocation or enforcement.
+
+\section{Conclusion}
+
+Environmental and socioeconomic features contain information about conflict risk at subnational scale, but models should be validated out-of-sample, communicated with uncertainty, and paired with governance discussion---especially where scores could be misused. Future work includes richer institutional covariates, better missing-data strategies for remote sensing, and tighter links to operational early-warning workflows.
+
+\begin{linkbox}
+\textbf{Replication.} Code and data pipeline: \url{https://github.com/anfelipecb/conflict-prediction-ml}. The course site hosts an interactive Kepler viewer under \texttt{docs/}.
+\end{linkbox}
+
+\printbibliography
+
+\end{document}

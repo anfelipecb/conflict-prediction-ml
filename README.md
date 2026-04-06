@@ -168,6 +168,9 @@ bash scripts/export_final_doc_pdf.sh
 
 Writes `milestones/milestone_6/final_doc.pdf` and copies to `notebooks/final_doc.pdf`. Requires a working `jupyter nbconvert` with the `webpdf` exporter and Chromium for Playwright.
 
+### LaTeX paper (publication-style PDF)
+The [`latex/`](latex/) folder contains `main.tex`, `references.bib`, and a Makefile. Build with `latexmk -pdf main.tex` or `make -C latex` (requires TeX Live / MacTeX and `biber`). See [`latex/README.md`](latex/README.md). Figures load from [`output/`](output/) (see README there for `confusion_LR` / `confusion_KNN` filenames).
+
 ### Model Training
 - Individual models: See `training/` directory
 - Ensemble comparison: `training/comparison_models_ensemble.ipynb`
@@ -181,7 +184,7 @@ Writes `milestones/milestone_6/final_doc.pdf` and copies to `notebooks/final_doc
 ```
 Camacho, A., Eyzaguirre, A., & Hernández Pedraza, P. (2025). 
 Predicting Conflict in Africa: A Machine Learning Approach Using Environmental Stressors. 
-University of Chicago, Harris School of Public Policy.
+University of Chicago, MSCAPP.
 ```
 
 ## Contact
