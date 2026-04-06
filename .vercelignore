@@ -1,0 +1,13 @@
+# Keep Vercel CLI uploads small when deploying from repo root (optional).
+# Preferred: import the GitHub repo in the Vercel dashboard and set Root Directory to "docs".
+data/
+notebooks/
+milestones/
+training/
+conflict_climate/
+src/
+scripts/
+*.ipynb
+*.parquet
+*.geojson
+models/
