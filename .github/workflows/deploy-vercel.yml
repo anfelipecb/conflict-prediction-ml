@@ -1,5 +1,5 @@
-# Deploys docs/ to Vercel on every push to main (same behavior as native “Git integration”
-# when VERCEL_TOKEN is configured). Project IDs match the climate-conflict-ml project.
+# Deploys the static site from docs/ via root vercel.json (outputDirectory: docs).
+# Deploy from repo root so this matches Vercel Git integration (avoids 404 when index.html is only under docs/).
 #
 # One-time: GitHub repo → Settings → Secrets and variables → Actions → New repository secret
 #   Name: VERCEL_TOKEN
@@ -15,6 +15,7 @@ on:
     branches: [main]
     paths:
       - "docs/**"
+      - "vercel.json"
       - ".github/workflows/deploy-vercel.yml"
   workflow_dispatch:
 
@@ -36,7 +37,6 @@ jobs:
         run: npm install -g vercel@latest
 
       - name: Deploy production
-        working-directory: docs
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           # climate-conflict-ml (anfelipecbs-projects) — update if you recreate the project
