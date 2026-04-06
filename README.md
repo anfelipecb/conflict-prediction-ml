@@ -15,7 +15,7 @@ This project investigates the predictability of violent conflict in Africa using
 
 Static site source lives under [`docs/`](docs/) (same HTML for every host below). Kepler.gl maps load large JSON files; the embedded viewer can take up to a minute—wait for the map.
 
-- **Live site (Vercel — climate-conflict-ml)**: **[https://climate-conflict-ml.vercel.app](https://climate-conflict-ml.vercel.app)** — primary CDN deployment. In the Vercel dashboard, import this repo and set **Root Directory** to `docs`, or deploy from the repo with `cd docs && vercel deploy --prod` (project name `climate-conflict-ml`).
+- **Live site (Vercel — climate-conflict-ml)**: **[https://climate-conflict-ml.vercel.app](https://climate-conflict-ml.vercel.app)** — production deploys from `main` via [`.github/workflows/deploy-vercel.yml`](.github/workflows/deploy-vercel.yml) whenever `docs/` changes (same effect as Vercel’s Git integration). **One-time setup:** in this GitHub repo go to **Settings → Secrets and variables → Actions**, add a secret named **`VERCEL_TOKEN`** whose value is a token from [Vercel → Account → Tokens](https://vercel.com/account/tokens). Until that secret exists, the Vercel workflow will fail on push; after you add it, redeploy from the **Actions** tab or push again. You can still deploy manually with `cd docs && vercel deploy --prod`.
 - **Live site (GitHub Pages)**: **[https://anfelipecb.github.io/conflict-prediction-ml/](https://anfelipecb.github.io/conflict-prediction-ml/)** — deployed by [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) on every push to `main`.
 
 ### Kepler predictions map (`kepler_predictions.json`)
