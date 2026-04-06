@@ -13,19 +13,32 @@ This project investigates the predictability of violent conflict in Africa using
 
 ## Demo
 
-- **Live site (GitHub Pages)**: **[https://anfelipecb.github.io/conflict-prediction-ml/](https://anfelipecb.github.io/conflict-prediction-ml/)** — same content as [`docs/index.html`](docs/index.html), deployed automatically when you push to `main`.
+Static site source lives under [`docs/`](docs/) (same HTML for every host below). Kepler.gl maps load large JSON files; the embedded viewer can take up to a minute—wait for the map.
+
+- **Live site (Vercel — climate-conflict-ml)**: **[https://climate-conflict-ml.vercel.app](https://climate-conflict-ml.vercel.app)** — primary CDN deployment. In the Vercel dashboard, import this repo and set **Root Directory** to `docs`, or deploy from the repo with `cd docs && vercel deploy --prod` (project name `climate-conflict-ml`).
+- **Live site (GitHub Pages)**: **[https://anfelipecb.github.io/conflict-prediction-ml/](https://anfelipecb.github.io/conflict-prediction-ml/)** — deployed by [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) on every push to `main`.
+
+### Kepler predictions map (`kepler_predictions.json`)
+
+The **Predictions** tab in the Viewer loads [`docs/data/map/kepler_predictions.json`](docs/data/map/kepler_predictions.json), produced by merging ensemble scores into the Kepler export:
+
+```bash
+uv run python scripts/export_kepler_predictions.py
+```
+
+Requires `data/output/grid_conflict_climate_2019_23.parquet` and trained artifacts under `models/ensemble/`. The workflow runs the same command with `|| true` so CI still passes when those paths are absent; commit the JSON when you regenerate it locally (keep under GitHub’s 100 MB blob limit).
 
 ### How GitHub Pages deployment works
 
 1. **Workflow**: [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) runs on every push to `main` (and can be run manually under **Actions → Deploy to GitHub Pages → Run workflow**).
 2. **What gets published**: The **`docs/`** folder after a short build step:
-   - Your committed static assets: `index.html`, `kepler_*.html`, `full_report.html`, etc.
-   - **Optional refresh** of `docs/input_data.geojson` and `docs/predictions.geojson` via `scripts/generate_*.py` when `data/output/` and `models/ensemble/` exist in the runner (if paths are missing, those steps are skipped with `|| true` and the site still uses the GeoJSON already in the repo).
+   - Your committed static assets: `index.html`, `kepler_*.html`, `full_report.html`, `data/map/*.json`, etc.
+   - **Optional refresh** of `docs/input_data.geojson` and `docs/predictions.geojson` via `scripts/generate_*.py`, and optional `docs/data/map/kepler_predictions.json` via `scripts/export_kepler_predictions.py`, when `data/output/` and `models/ensemble/` exist in the runner (if paths are missing, those steps are skipped with `|| true` and the site uses committed assets).
 3. **One-time repo setup** (if the site shows 404):
    - GitHub → **Settings → Pages**
    - Under **Build and deployment**, set **Source** to **GitHub Actions** (not “Deploy from a branch”).
    - After the first successful run, the public URL is **`https://<user>.github.io/<repo>/`** (for this repo: link above).
-4. **Preview locally**: Open `docs/index.html` in a browser from your machine (some features may need a local server if the browser blocks file URLs).
+4. **Preview locally**: From `docs/`, run `python -m http.server 8080` and open `http://localhost:8080/` (Kepler and fetches need HTTP, not `file://`).
 
 ### Git hook hint (`post-commit` / `pre-push` ignored)
 
@@ -144,7 +157,16 @@ This project uses UV for dependency management. To reproduce the environment:
 ## Running the Analysis
 
 ### Quick Start
-1. Navigate to `milestones/milestone_6/` for the main final document with all analysis
+1. Navigate to `milestones/milestone_6/` for the main final document with all analysis ([`final_doc.ipynb`](milestones/milestone_6/final_doc.ipynb)).
+
+### Final PDF report
+After editing the notebook, export to PDF with Playwright webpdf:
+
+```bash
+bash scripts/export_final_doc_pdf.sh
+```
+
+Writes `milestones/milestone_6/final_doc.pdf` and copies to `notebooks/final_doc.pdf`. Requires a working `jupyter nbconvert` with the `webpdf` exporter and Chromium for Playwright.
 
 ### Model Training
 - Individual models: See `training/` directory

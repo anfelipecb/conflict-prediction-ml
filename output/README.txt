@@ -20,4 +20,4 @@ Regenerate docs/full_report.html after editing the notebook:
 
 Vercel: import the GitHub repo and set Root Directory to "docs", or from the repo run:
   cd docs && vercel deploy --prod
-  Production alias example: https://docs-wheat-sigma.vercel.app (see your Vercel dashboard for the current URL).
+  Project name: climate-conflict-ml — production URL: https://climate-conflict-ml.vercel.app (see dashboard for team-specific URLs).

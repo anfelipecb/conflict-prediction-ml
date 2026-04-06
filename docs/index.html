@@ -227,6 +227,13 @@
       margin: 0 auto;
       width: 100%;
     }
+    .viewer-hint {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin: 0 0 0.85rem;
+      padding: 0 0.25rem;
+      line-height: 1.45;
+    }
     .viewer-subtabs {
       display: flex;
       justify-content: center;
@@ -482,6 +489,7 @@
 
       <section class="tab-panel" id="panel-viewer">
         <div class="viewer-wrapper">
+          <p class="viewer-hint">Kepler.gl loads map data from a large JSON file; the embedded viewer can take up to a minute to appear—please wait.</p>
           <nav class="viewer-subtabs">
             <button class="viewer-subtab active" data-viewer="input">Input Data</button>
             <button class="viewer-subtab" data-viewer="predictions">Predictions</button>
