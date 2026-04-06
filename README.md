@@ -18,6 +18,12 @@ Static site source lives under [`docs/`](docs/) (same HTML for every host below)
 - **Live site (Vercel — climate-conflict-ml)**: **[https://climate-conflict-ml.vercel.app](https://climate-conflict-ml.vercel.app)** — production deploys from `main` via [`.github/workflows/deploy-vercel.yml`](.github/workflows/deploy-vercel.yml). The repo root [`vercel.json`](vercel.json) sets **`outputDirectory` to `docs`**, so the deployed site is the static files in [`docs/`](docs/) (where `index.html` lives). **One-time setup:** GitHub → **Settings → Secrets → Actions** → add **`VERCEL_TOKEN`** from [Vercel → Tokens](https://vercel.com/account/tokens). Manual deploy: from the **repository root**, run `vercel deploy --prod` (not from `docs/` alone). **If you see `404 NOT_FOUND`:** in the Vercel project → **Settings → General → Root Directory**, leave it **empty** (repository root) so `vercel.json` applies; do **not** set Root Directory to `docs` unless you remove the root `outputDirectory` pattern and point the project only at `docs/`.
 - **Live site (GitHub Pages)**: **[https://anfelipecb.github.io/conflict-prediction-ml/](https://anfelipecb.github.io/conflict-prediction-ml/)** — deployed by [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) on every push to `main`.
 
+### Kepler input map (Viewer → Input Data)
+
+The **Input Data** tab loads [`docs/kepler_input.html`](docs/kepler_input.html), which opens the [Kepler.gl demo](https://kepler.gl/demo) with this map config URL (Dropbox JSON):  
+`https://dl.dropboxusercontent.com/scl/fi/h72duzw7g0s0zky11lxoo/keplergl_bkyf7mt.json?rlkey=15ddha0y08stj8n0xs2rqtl6r&dl=0`  
+An equivalent iframe wrapper lives at [`docs/data/map/kepler.gl_inputs.html`](docs/data/map/kepler.gl_inputs.html). The large checked-in `docs/data/map/kepler.gl.json` is still available for local tooling and replication; the live viewer does not depend on it.
+
 ### Kepler predictions map (`kepler_predictions.json`)
 
 The **Predictions** tab loads [`docs/kepler_predictions.html`](docs/kepler_predictions.html) (Kepler iframe + thin PuRd ramp) using [`docs/data/map/kepler_predictions.json`](docs/data/map/kepler_predictions.json). Export pipeline: `load_and_preprocess_data` → ensemble `predict` → GeoPandas join with **only** `GEOID`, `year`, `ensemble_prob`, `ensemble_pred`, and geometry (grid trimmed to `GEOID` + geometry). Kepler layer: **ensemble_prob**, **quantile** scale, **ColorBrewer PuRd**. [`ensemble_predictions.geojson`](docs/data/map/ensemble_predictions.geojson) matches those attributes.
