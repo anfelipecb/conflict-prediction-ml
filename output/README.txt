@@ -18,4 +18,6 @@ Regenerate docs/full_report.html after editing the notebook:
   jupyter nbconvert --to html --output-dir docs --output full_report milestones/milestone_6/final_doc.ipynb
   (Requires a working nbconvert/Jupyter template install.)
 
-Vercel: set the project Root Directory to "docs" so index.html is the site entry.
+Vercel: import the GitHub repo and set Root Directory to "docs", or from the repo run:
+  cd docs && vercel deploy --prod
+  Production alias example: https://docs-wheat-sigma.vercel.app (see your Vercel dashboard for the current URL).
