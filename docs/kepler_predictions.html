@@ -45,9 +45,18 @@
         return;
       }
       var jsonUrl = new URL('data/map/kepler_predictions.json', window.location.href).href;
-      fetch(jsonUrl, { method: 'HEAD' })
-        .then(function (r) {
-          if (!r.ok) throw new Error('missing');
+      function mapOk(r) {
+        return r && (r.ok || r.status === 206);
+      }
+      function tryLoad() {
+        return fetch(jsonUrl, { method: 'HEAD', cache: 'no-store' }).then(function (r) {
+          if (mapOk(r)) return true;
+          return fetch(jsonUrl, { headers: { Range: 'bytes=0-0' }, cache: 'no-store' }).then(function (r2) { return mapOk(r2); });
+        });
+      }
+      tryLoad()
+        .then(function (ok) {
+          if (!ok) throw new Error('missing');
           var iframe = document.createElement('iframe');
           iframe.src = 'https://kepler.gl/demo/map?mapUrl=' + encodeURIComponent(jsonUrl);
           iframe.title = 'Kepler.gl — ensemble probability (PuRd)';
@@ -55,7 +64,7 @@
           wrap.appendChild(iframe);
         })
         .catch(function () {
-          wrap.innerHTML = '<p class="msg">Missing <code>kepler_predictions.json</code>. Run <code>uv run python scripts/export_kepler_predictions.py</code>.</p>';
+          wrap.innerHTML = '<p class="msg">Missing <code>kepler_predictions.json</code>. Run <code>uv run python scripts/export_kepler_predictions.py</code> and deploy with <code>docs/data/map/</code> included.</p>';
         });
     })();
   </script>
