@@ -3,18 +3,46 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Predictions - Kepler.gl</title>
+  <title>Predictions — Kepler.gl</title>
   <style>
-    body { margin: 0; font-family: system-ui, sans-serif; padding: 2rem; background: #f8fafc; color: #6b7280; }
-    .placeholder { text-align: center; padding: 4rem 2rem; }
-    .placeholder h2 { color: #1a1a1a; margin-bottom: 0.5rem; }
-    .placeholder p { max-width: 32rem; margin: 0 auto; }
+    html, body { margin: 0; height: 100%; overflow: hidden; background: #0c1118; }
+    #frame-wrap { width: 100%; height: 100%; min-height: 400px; }
+    iframe { width: 100%; height: 100%; border: 0; display: block; }
+    .msg {
+      font-family: system-ui, sans-serif;
+      color: #94a3b8;
+      padding: 2rem;
+      max-width: 38rem;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+    .msg code { color: #e8a54b; }
   </style>
 </head>
 <body>
-  <div class="placeholder">
-    <h2>Predictions Map</h2>
-    <p>Replace this file with your Kepler.gl export for model predictions (conflict probability). Export from Kepler.gl and save as <code>kepler_predictions.html</code> in the docs folder.</p>
-  </div>
+  <div id="frame-wrap"></div>
+  <script>
+    (function () {
+      var wrap = document.getElementById('frame-wrap');
+      if (window.location.protocol === 'file:') {
+        wrap.innerHTML = '<p class="msg">Kepler needs an <code>https://</code> or <code>http://</code> URL for the map data. From the <code>docs/</code> folder run <code>python -m http.server 8080</code> and open <code>http://localhost:8080/kepler_predictions.html</code>, or deploy to Vercel / GitHub Pages.</p>';
+        return;
+      }
+      var jsonUrl = new URL('data/map/kepler_predictions.json', window.location.href).href;
+      fetch(jsonUrl, { method: 'HEAD' })
+        .then(function (r) {
+          if (!r.ok) throw new Error('missing');
+          var demo = 'https://kepler.gl/demo/map?mapUrl=' + encodeURIComponent(jsonUrl);
+          var iframe = document.createElement('iframe');
+          iframe.src = demo;
+          iframe.title = 'Kepler.gl — predictions';
+          iframe.setAttribute('loading', 'lazy');
+          wrap.appendChild(iframe);
+        })
+        .catch(function () {
+          wrap.innerHTML = '<p class="msg">Predictions map file not found. Generate it locally: <code>uv run python scripts/export_kepler_predictions.py</code> (requires <code>data/output/grid_conflict_climate_2019_23.parquet</code> and trained models under <code>models/ensemble/</code>). That writes <code>docs/data/map/kepler_predictions.json</code>.</p>';
+        });
+    })();
+  </script>
 </body>
 </html>

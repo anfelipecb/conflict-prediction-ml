@@ -26,3 +26,4 @@ data/output/grid_conflict_climate_with_geometry.geojson
 
 # Random Forest joblib (~230 MB); run `uv run python scripts/train_and_save.py` locally
 models/ensemble/Random_Forest.joblib
+data/map/*.json

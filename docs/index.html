@@ -4,116 +4,157 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Predicting Conflict in Africa | ML + Environmental Data</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
   <style>
     :root {
-      --bg: #ffffff;
-      --surface: #f8fafc;
-      --text: #1a1a1a;
-      --muted: #6b7280;
-      --accent: #ffbb00;
-      --accent-light: #fff8e6;
-      --conflict: #dc2626;
-      --border: #e5e7eb;
+      --bg-deep: #0c1118;
+      --bg-card: #141b26;
+      --bg-elevated: #1a2332;
+      --text: #e8edf4;
+      --muted: #8b9cb3;
+      --accent: #e8a54b;
+      --accent-dim: rgba(232, 165, 75, 0.15);
+      --border: rgba(255, 255, 255, 0.08);
+      --glow: rgba(232, 165, 75, 0.35);
     }
     * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
     body {
       margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: var(--bg);
+      font-family: "Outfit", system-ui, sans-serif;
+      background: var(--bg-deep);
       color: var(--text);
       line-height: 1.65;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(232, 165, 75, 0.12), transparent 50%),
+        radial-gradient(ellipse 60% 40% at 100% 50%, rgba(59, 130, 246, 0.06), transparent 45%),
+        radial-gradient(ellipse 50% 30% at 0% 80%, rgba(232, 165, 75, 0.05), transparent 40%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .shell {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
       min-height: 100vh;
     }
 
-    /* Header banner - black, compact */
-    .header-banner {
-      width: 100%;
-      background: #0d0d0d;
-      padding: 1rem 2rem;
-      text-align: center;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
+    .hero {
+      padding: 2.25rem 1.75rem 1.75rem;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, var(--bg-card) 0%, var(--bg-deep) 100%);
     }
-    .header-banner h1 {
-      font-family: Georgia, "Times New Roman", serif;
-      font-size: 1.6rem;
+    .hero-inner {
+      max-width: 56rem;
+      margin: 0 auto;
+    }
+    .hero h1 {
+      font-family: "Fraunces", Georgia, serif;
+      font-size: clamp(1.65rem, 4vw, 2.15rem);
       font-weight: 700;
-      margin: 0 0 0.35rem;
+      font-variation-settings: "opsz" 72;
+      margin: 0 0 0.75rem;
       letter-spacing: -0.02em;
-      color: #ffffff;
+      line-height: 1.2;
     }
-    .header-banner p {
-      color: rgba(255,255,255,0.8);
-      font-size: 0.9rem;
+    .hero p.lead {
       margin: 0;
-      max-width: 42rem;
-      margin-left: auto;
-      margin-right: auto;
+      color: var(--muted);
+      font-size: 1rem;
+      max-width: 38rem;
     }
 
-    /* Tabs - centered */
     .tabs {
       display: flex;
+      flex-wrap: wrap;
       justify-content: center;
-      gap: 0;
-      padding: 0 2rem;
-      background: var(--surface);
+      gap: 0.5rem;
+      padding: 1rem 1.25rem 1.25rem;
+      background: rgba(12, 17, 24, 0.85);
+      backdrop-filter: blur(8px);
       border-bottom: 1px solid var(--border);
-      overflow-x: auto;
+      position: sticky;
+      top: 0;
+      z-index: 10;
     }
     .tab {
-      padding: 1rem 1.25rem;
-      background: none;
-      border: none;
+      padding: 0.55rem 1.1rem;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 999px;
       color: var(--muted);
-      font-size: 0.9rem;
+      font-family: inherit;
+      font-size: 0.82rem;
       font-weight: 500;
       cursor: pointer;
-      border-bottom: 2px solid transparent;
-      white-space: nowrap;
+      transition: color 0.2s, border-color 0.2s, box-shadow 0.2s, background 0.2s;
     }
-    .tab:hover { color: var(--text); }
+    .tab:hover {
+      color: var(--text);
+      border-color: rgba(232, 165, 75, 0.35);
+    }
     .tab.active {
-      color: var(--accent);
-      border-bottom-color: var(--accent);
+      color: var(--bg-deep);
+      background: var(--accent);
+      border-color: var(--accent);
+      box-shadow: 0 0 24px var(--glow);
     }
 
-    /* Tab panels */
     .tab-panel {
       display: none;
       flex: 1;
       overflow-y: auto;
-      padding: 2.5rem 2rem;
+      padding: 2rem 1.5rem 3rem;
     }
-    .tab-panel.active {
-      display: block;
-    }
+    .tab-panel.active { display: block; }
 
     .container {
       max-width: 52rem;
       margin: 0 auto;
     }
     .section {
-      margin-bottom: 2.5rem;
+      margin-bottom: 2.25rem;
     }
     .section h2 {
-      font-family: Georgia, "Times New Roman", serif;
+      font-family: "Fraunces", Georgia, serif;
       font-size: 1.2rem;
-      margin: 0 0 0.75rem;
+      font-weight: 600;
+      margin: 0 0 0.85rem;
       color: var(--accent);
-      padding-left: 0.75rem;
-      border-left: 3px solid var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+    .section h2::before {
+      content: "";
+      width: 4px;
+      height: 1.1em;
+      background: linear-gradient(180deg, var(--accent), rgba(232, 165, 75, 0.35));
+      border-radius: 2px;
     }
     .section p {
       color: var(--text);
       margin: 0 0 1rem;
+      font-size: 0.95rem;
     }
     .section p:last-child { margin-bottom: 0; }
 
-    /* Data source cards */
     .data-cards {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -121,21 +162,22 @@
       margin: 1.5rem 0;
     }
     .data-card {
-      background: var(--bg);
+      background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: 8px;
+      border-radius: 12px;
       padding: 1.25rem;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-      transition: box-shadow 0.2s, border-color 0.2s;
+      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
     }
     .data-card:hover {
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-      border-color: var(--accent);
+      transform: translateY(-2px);
+      border-color: rgba(232, 165, 75, 0.25);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
     }
     .data-card h3 {
       font-size: 0.95rem;
       margin: 0 0 0.5rem;
       color: var(--accent);
+      font-weight: 600;
     }
     .data-card p {
       font-size: 0.85rem;
@@ -144,17 +186,15 @@
       line-height: 1.5;
     }
 
-    /* Model blocks */
     .model-block {
-      background: var(--surface);
+      background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: 8px;
+      border-radius: 12px;
       padding: 1.5rem;
       margin-bottom: 1.25rem;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
     }
     .model-block h3 {
-      font-family: Georgia, "Times New Roman", serif;
+      font-family: "Fraunces", Georgia, serif;
       font-size: 1.05rem;
       margin: 0 0 0.5rem;
       color: var(--text);
@@ -164,24 +204,24 @@
       font-size: 0.95rem;
     }
     .equation-block {
-      background: var(--bg);
+      background: var(--bg-deep);
       border: 1px solid var(--border);
-      border-radius: 6px;
+      border-radius: 8px;
       padding: 1rem 1.25rem;
       margin: 0.75rem 0;
       overflow-x: auto;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
     }
+    .equation-block .katex { color: var(--text); }
     .results-callout {
-      background: var(--accent-light);
-      border: 1px solid var(--accent);
-      border-radius: 8px;
+      background: var(--accent-dim);
+      border: 1px solid rgba(232, 165, 75, 0.35);
+      border-radius: 12px;
       padding: 1.25rem;
       margin: 1.5rem 0;
     }
     .results-callout strong { color: var(--accent); }
 
-    /* Viewer: sub-tabs with Kepler embeds */
     .viewer-wrapper {
       max-width: 72rem;
       margin: 0 auto;
@@ -190,26 +230,29 @@
     .viewer-subtabs {
       display: flex;
       justify-content: center;
-      gap: 0;
+      flex-wrap: wrap;
+      gap: 0.5rem;
       padding: 0 0 1rem;
       border-bottom: 1px solid var(--border);
       margin-bottom: 1rem;
     }
     .viewer-subtab {
-      padding: 0.75rem 1.5rem;
-      background: none;
-      border: none;
+      padding: 0.5rem 1.25rem;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 999px;
       color: var(--muted);
-      font-size: 0.9rem;
+      font-family: inherit;
+      font-size: 0.85rem;
       font-weight: 500;
       cursor: pointer;
-      border-bottom: 2px solid transparent;
-      margin-bottom: -1px;
+      transition: color 0.2s, border-color 0.2s, background 0.2s;
     }
-    .viewer-subtab:hover { color: var(--text); }
+    .viewer-subtab:hover { color: var(--text); border-color: rgba(232, 165, 75, 0.3); }
     .viewer-subtab.active {
-      color: var(--accent);
-      border-bottom-color: var(--accent);
+      color: var(--bg-deep);
+      background: var(--accent);
+      border-color: var(--accent);
     }
     .viewer-subpanel {
       display: none;
@@ -217,12 +260,10 @@
       min-height: 400px;
       overflow: auto;
       border: 1px solid var(--border);
-      border-radius: 8px;
-      background: var(--surface);
+      border-radius: 12px;
+      background: var(--bg-card);
     }
-    .viewer-subpanel.active {
-      display: block;
-    }
+    .viewer-subpanel.active { display: block; }
     .viewer-subpanel iframe {
       width: 100%;
       min-height: 600px;
@@ -230,9 +271,9 @@
     }
 
     .video-placeholder {
-      background: var(--surface);
+      background: var(--bg-elevated);
       border: 2px dashed var(--border);
-      border-radius: 8px;
+      border-radius: 12px;
       padding: 2rem;
       text-align: center;
       color: var(--muted);
@@ -249,215 +290,219 @@
       width: 100%;
       height: 100%;
       border: 1px solid var(--border);
-      border-radius: 8px;
+      border-radius: 12px;
+      background: #fff;
     }
 
     .cta-link {
       display: inline-block;
       margin-top: 1rem;
-      padding: 0.5rem 1rem;
+      padding: 0.55rem 1.15rem;
       background: var(--accent);
-      color: #1a1a1a;
+      color: var(--bg-deep);
       text-decoration: none;
-      border-radius: 6px;
-      font-weight: 500;
-      font-size: 0.9rem;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 0.88rem;
+      transition: box-shadow 0.2s, transform 0.2s;
     }
-    .cta-link:hover { opacity: 0.9; }
+    .cta-link:hover {
+      box-shadow: 0 0 28px var(--glow);
+      transform: translateY(-1px);
+    }
 
     footer {
-      padding: 1.5rem 2rem;
+      padding: 1.5rem 1.5rem;
       text-align: center;
       color: var(--muted);
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       margin-top: auto;
-      background: var(--surface);
+      background: var(--bg-card);
       border-top: 1px solid var(--border);
     }
+    footer p { margin: 0.25rem 0; }
   </style>
 </head>
 <body>
-  <header class="header-banner">
-    <h1>Using Machine Learning to Predict Conflict in Africa</h1>
-    <p>Satellite-derived environmental and socioeconomic data applied to 50km grid cells across Africa (2019–2023).</p>
-  </header>
-
-  <nav class="tabs">
-    <button class="tab active" data-tab="home">Home</button>
-    <button class="tab" data-tab="data">Data</button>
-    <button class="tab" data-tab="models">Models & Results</button>
-    <button class="tab" data-tab="viewer">Viewer</button>
-    <button class="tab" data-tab="report">Full Report</button>
-  </nav>
-
-  <main>
-    <!-- Home -->
-    <section class="tab-panel active" id="panel-home">
-      <div class="container">
-        <div class="section">
-          <h2>Abstract</h2>
-          <p>This paper investigates the predictability of violent conflict in Africa using machine learning techniques applied to satellite-derived environmental and socioeconomic data across 50km × 50km grid cells from 2019–2023. We implement and compare four modeling approaches—logistic regression, K-nearest neighbors, random forest, and neural networks—trained on climate variables, wealth indicators, and historical conflict patterns to predict binary conflict occurrence. Our Conservative ensemble model achieves 72.3% recall and 52.0% precision, demonstrating that environmental stressors and socioeconomic conditions can meaningfully predict conflict events. However, the precision-recall tradeoff highlights the challenge of developing early warning systems that balance conflict detection with operational feasibility for policymakers and humanitarian organizations.</p>
-        </div>
-        <div class="section">
-          <h2>Introduction</h2>
-          <p>Conflict remains a major barrier to development, stability, and humanitarian well-being, particularly in regions affected by environmental stress and resource scarcity. Understanding and predicting the spatial and temporal dynamics of conflict events can provide critical insights for policymakers, aid organizations, and local communities to better allocate resources, anticipate humanitarian crises, and design targeted interventions.</p>
-          <p>Africa, given its complex dynamics of resource-driven conflicts, economic inequalities, and climate-induced stress, serves as an ideal context to explore how environmental and socioeconomic factors interact and influence conflict risks. Our research question: <em>Can the occurrence of violence in a given geography be predicted using local socioeconomic and environmental data?</em></p>
-        </div>
-        <div class="section">
-          <h2>Relevance</h2>
-          <p>Our project is part of a broader research agenda using data and predictive modelling to measure the likelihood of conflict. Notable efforts include the Violence and Impacts Early Warning System (VIEWS), led by Uppsala University and PRIO, which provides monthly predictions on worldwide fatalities from state-based violence at the grid level. Significant resources are directed towards diplomatic and peacekeeping efforts to prevent escalation and establish accurate early alert systems. On-the-ground data is hard to extract; automation promises to enhance planning and strategic use of resources using satellite imagery, maps, media, and official statistics for subnational diagnosis. A key challenge: over-prediction of conflict is understandable given the high cost of false negatives, but limited resources constrain operational response.</p>
-        </div>
-        <div class="section">
-          <h2>Methodology</h2>
-          <p>We divide the African continent into 50km × 50km grid cells and match environmental and socioeconomic features from satellite and auxiliary datasets to each cell. We implement four modeling approaches—logistic regression, K-nearest neighbors, random forest, and neural networks—trained on climate variables, wealth indicators, and historical conflict patterns to predict binary conflict occurrence.</p>
-          <p>Our Conservative ensemble combines these models (LR 30%, KNN 25%, RF 35%, NN 10%) to achieve balanced recall and precision. We address class imbalance (~92% non-conflict, ~8% conflict) using SMOTE during training.</p>
-        </div>
+  <div class="shell">
+    <header class="hero">
+      <div class="hero-inner">
+        <h1>Using Machine Learning to Predict Conflict in Africa</h1>
+        <p class="lead">Satellite-derived environmental and socioeconomic data applied to 50km grid cells across Africa (2019–2023).</p>
       </div>
-    </section>
+    </header>
 
-    <!-- Data -->
-    <section class="tab-panel" id="panel-data">
-      <div class="container">
-        <div class="section">
-          <h2>Data Pipeline</h2>
-          <p>Our pipeline integrates five data sources—four from satellite imagery and one from ground-referenced records—to build a rich feature set for each 50km grid cell. These environmental and socioeconomic signals capture the conditions that may precede or accompany conflict.</p>
-        </div>
-        <div class="section">
-          <h2>Data Collection</h2>
-          <p>Between 1989 and 2023, violent events across Africa showed a sharp peak in 1994, intermittent decline through 2006, and a steady increase from 2010 onwards. Thirteen of 46 countries comprised the majority of violent events, with DR Congo, Nigeria, and Somalia accounting for more than one-third of all records.</p>
-        </div>
-        <div class="data-cards">
-          <div class="data-card">
-            <h3>UCDP</h3>
-            <p>Uppsala Conflict Data Program: georeferenced conflict events with coordinates and dates worldwide.</p>
+    <nav class="tabs">
+      <button class="tab active" data-tab="home">Home</button>
+      <button class="tab" data-tab="data">Data</button>
+      <button class="tab" data-tab="models">Models & Results</button>
+      <button class="tab" data-tab="viewer">Viewer</button>
+      <button class="tab" data-tab="report">Full Report</button>
+    </nav>
+
+    <main>
+      <section class="tab-panel active" id="panel-home">
+        <div class="container">
+          <div class="section">
+            <h2>Abstract</h2>
+            <p>This paper investigates the predictability of violent conflict in Africa using machine learning techniques applied to satellite-derived environmental and socioeconomic data across 50km × 50km grid cells from 2019–2023. We implement and compare four modeling approaches—logistic regression, K-nearest neighbors, random forest, and neural networks—trained on climate variables, wealth indicators, and historical conflict patterns to predict binary conflict occurrence. Our Conservative ensemble model achieves 72.3% recall and 52.0% precision, demonstrating that environmental stressors and socioeconomic conditions can meaningfully predict conflict events. However, the precision-recall tradeoff highlights the challenge of developing early warning systems that balance conflict detection with operational feasibility for policymakers and humanitarian organizations.</p>
           </div>
-          <div class="data-card">
-            <h3>ERA5 Reanalysis</h3>
-            <p>Monthly atmospheric variables—temperature, precipitation, surface pressure—at ~31km resolution.</p>
+          <div class="section">
+            <h2>Introduction</h2>
+            <p>Conflict remains a major barrier to development, stability, and humanitarian well-being, particularly in regions affected by environmental stress and resource scarcity. Understanding and predicting the spatial and temporal dynamics of conflict events can provide critical insights for policymakers, aid organizations, and local communities to better allocate resources, anticipate humanitarian crises, and design targeted interventions.</p>
+            <p>Africa, given its complex dynamics of resource-driven conflicts, economic inequalities, and climate-induced stress, serves as an ideal context to explore how environmental and socioeconomic factors interact and influence conflict risks. Our research question: <em>Can the occurrence of violence in a given geography be predicted using local socioeconomic and environmental data?</em></p>
           </div>
-          <div class="data-card">
-            <h3>Meta RWI</h3>
-            <p>Relative Wealth Index: predicts living standards using connectivity data and satellite imagery.</p>
+          <div class="section">
+            <h2>Relevance</h2>
+            <p>Our project is part of a broader research agenda using data and predictive modelling to measure the likelihood of conflict. Notable efforts include the Violence and Impacts Early Warning System (VIEWS), led by Uppsala University and PRIO, which provides monthly predictions on worldwide fatalities from state-based violence at the grid level. Significant resources are directed towards diplomatic and peacekeeping efforts to prevent escalation and establish accurate early alert systems. On-the-ground data is hard to extract; automation promises to enhance planning and strategic use of resources using satellite imagery, maps, media, and official statistics for subnational diagnosis. A key challenge: over-prediction of conflict is understandable given the high cost of false negatives, but limited resources constrain operational response.</p>
           </div>
-          <div class="data-card">
-            <h3>Hansen Forest</h3>
-            <p>Global forest extent and change from 2000 onward; annual forest cover loss.</p>
-          </div>
-          <div class="data-card">
-            <h3>NASA VIIRS</h3>
-            <p>Nighttime light emissions as a proxy for human settlements and economic activity.</p>
+          <div class="section">
+            <h2>Methodology</h2>
+            <p>We divide the African continent into 50km × 50km grid cells and match environmental and socioeconomic features from satellite and auxiliary datasets to each cell. We implement four modeling approaches—logistic regression, K-nearest neighbors, random forest, and neural networks—trained on climate variables, wealth indicators, and historical conflict patterns to predict binary conflict occurrence.</p>
+            <p>Our Conservative ensemble combines these models (LR 30%, KNN 25%, RF 35%, NN 10%) to achieve balanced recall and precision. We address class imbalance (~92% non-conflict, ~8% conflict) using SMOTE during training.</p>
           </div>
         </div>
-        <div class="section">
-          <h2>Feature Set</h2>
-          <p><strong>Conflict prevalence:</strong> Conflict occurrence (binary label), number of conflict events in prior years.</p>
-          <p><strong>Climate and environmental:</strong> Average and max annual temperature, annual precipitation, surface pressure, forest cover loss (Hansen), temperature anomaly (binary deviation from historical norms).</p>
-          <p><strong>Socioeconomic:</strong> Relative Wealth Index (Meta RWI), nighttime lights intensity, year-over-year change in nighttime lights (economic growth proxy).</p>
-        </div>
-        <div class="section">
-          <h2>Final Dataset</h2>
-          <p>We extract additional features: year-over-year change in nighttime lights (economic proxy) and temperature anomalies (deviations from long-term norms). The final dataset has 34,015 grid-year observations with ~92% non-conflict and 8% conflict. Data cleaning includes checking for missing values, consistent data types and units, and normalization where necessary. We use SMOTE to address class imbalance during training.</p>
-          <p><a href="#" class="cta-link" data-goto="viewer">Explore the data in the Viewer</a></p>
-        </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- Models & Results -->
-    <section class="tab-panel" id="panel-models">
-      <div class="container">
-        <div class="section">
-          <h2>Why Multiple Models?</h2>
-          <p>We compare linear and non-linear approaches because conflict prediction involves both interpretable drivers (e.g., wealth, climate) and complex spatial patterns. No single model dominates: logistic regression offers interpretability, KNN captures geography, random forest provides feature importance, and neural networks learn non-linear interactions. Our Conservative ensemble balances these strengths for early-warning applications where both recall and precision matter.</p>
-        </div>
-
-        <div class="model-block">
-          <h3>1. Logistic Regression (ElasticNet)</h3>
-          <p>Interpretable baseline. We model conflict probability via the sigmoid of a linear combination of features:</p>
-          <div class="equation-block" data-math="P(y_i = 1 \mid x_i) = \sigma(w^\top x_i + b) = \frac{1}{1 + e^{-(w^\top x_i + b)}}"></div>
-          <p>We minimize the negative log-likelihood plus ElasticNet regularization:</p>
-          <div class="equation-block" data-math="\ell(w,b) = -\sum_{i=1}^n \log \sigma(y_i(w^\top x_i + b)) + \lambda\left[\alpha\sum_j |w_j| + (1-\alpha)\sum_j w_j^2\right]"></div>
-          <p>Hyperparameters: C (inverse penalty strength), α (L1/L2 mix). Best: α=0 (L2 only), C=10.</p>
-        </div>
-
-        <div class="model-block">
-          <h3>2. K-Nearest Neighbors</h3>
-          <p>Geography-based: conflict tends to cluster. We select the k nearest neighbors \(S_k\) by distance, then assign the majority class with distance-weighted voting:</p>
-          <div class="equation-block" data-math="\hat{y}_i = \arg\max_c \sum_{j \in S_k} w_j \cdot \mathbb{I}_{y_j=c}"></div>
-          <p>Distance metrics: Euclidean \(D_{\text{euc}}(x_i,x_j) = \sqrt{\sum_m (x_{im}-x_{jm})^2}\) or cosine similarity. Best: k=3, cosine similarity, distance weights \(w_j = 1/d_j\).</p>
-        </div>
-
-        <div class="model-block">
-          <h3>3. Random Forest</h3>
-          <p>Ensemble of B decision trees trained on bootstrapped samples with random feature subsets. Final prediction by majority vote:</p>
-          <div class="equation-block" data-math="\hat{y} = \text{mode}\{T_1(x), T_2(x), \ldots, T_B(x)\}"></div>
-          <p>Conflict probability:</p>
-          <div class="equation-block" data-math="P(\text{conflict}_i=1 \mid x_i) = \frac{1}{B}\sum_{b=1}^B \mathbb{I}(T_b(x_i)=1)"></div>
-          <p>Best: 500 trees, unlimited depth. Feature importance via Gini impurity.</p>
-        </div>
-
-        <div class="model-block">
-          <h3>4. Neural Network</h3>
-          <p>Fully connected 64 → 32 → 1 with ReLU and sigmoid output:</p>
-          <div class="equation-block" data-math="h_1 = \text{ReLU}(W_1 x + b_1),\quad h_2 = \text{ReLU}(W_2 h_1 + b_2),\quad P(\text{conflict})= \sigma(W_3 h_2 + b_3)"></div>
-          <p>Binary Cross-Entropy loss:</p>
-          <div class="equation-block" data-math="\mathcal{L} = -\frac{1}{n}\sum_{i=1}^n \left[y_i \log \hat{y}_i + (1-y_i)\log(1-\hat{y}_i)\right]"></div>
-          <p>SGD with momentum 0.9, 100 epochs, batch size 128.</p>
-        </div>
-
-        <div class="model-block">
-          <h3>5. Conservative Ensemble</h3>
-          <p>Weighted average of predicted probabilities, threshold 0.5 for classification:</p>
-          <div class="equation-block" data-math="\hat{p} = 0.30\, p_{\text{LR}} + 0.25\, p_{\text{KNN}} + 0.35\, p_{\text{RF}} + 0.10\, p_{\text{NN}}"></div>
-        </div>
-
-        <div class="section">
-          <h2>Results</h2>
-          <div class="results-callout">
-            <p><strong>Conservative ensemble:</strong> 72.3% recall, 52.0% precision, 92.3% accuracy. Environmental stressors and socioeconomic conditions meaningfully predict conflict. The precision-recall tradeoff reflects the challenge of early-warning systems: balancing detection with operational feasibility.</p>
+      <section class="tab-panel" id="panel-data">
+        <div class="container">
+          <div class="section">
+            <h2>Data Pipeline</h2>
+            <p>Our pipeline integrates five data sources—four from satellite imagery and one from ground-referenced records—to build a rich feature set for each 50km grid cell. These environmental and socioeconomic signals capture the conditions that may precede or accompany conflict.</p>
+          </div>
+          <div class="section">
+            <h2>Data Collection</h2>
+            <p>Between 1989 and 2023, violent events across Africa showed a sharp peak in 1994, intermittent decline through 2006, and a steady increase from 2010 onwards. Thirteen of 46 countries comprised the majority of violent events, with DR Congo, Nigeria, and Somalia accounting for more than one-third of all records.</p>
+          </div>
+          <div class="data-cards">
+            <div class="data-card">
+              <h3>UCDP</h3>
+              <p>Uppsala Conflict Data Program: georeferenced conflict events with coordinates and dates worldwide.</p>
+            </div>
+            <div class="data-card">
+              <h3>ERA5 Reanalysis</h3>
+              <p>Monthly atmospheric variables—temperature, precipitation, surface pressure—at ~31km resolution.</p>
+            </div>
+            <div class="data-card">
+              <h3>Meta RWI</h3>
+              <p>Relative Wealth Index: predicts living standards using connectivity data and satellite imagery.</p>
+            </div>
+            <div class="data-card">
+              <h3>Hansen Forest</h3>
+              <p>Global forest extent and change from 2000 onward; annual forest cover loss.</p>
+            </div>
+            <div class="data-card">
+              <h3>NASA VIIRS</h3>
+              <p>Nighttime light emissions as a proxy for human settlements and economic activity.</p>
+            </div>
+          </div>
+          <div class="section">
+            <h2>Feature Set</h2>
+            <p><strong>Conflict prevalence:</strong> Conflict occurrence (binary label), number of conflict events in prior years.</p>
+            <p><strong>Climate and environmental:</strong> Average and max annual temperature, annual precipitation, surface pressure, forest cover loss (Hansen), temperature anomaly (binary deviation from historical norms).</p>
+            <p><strong>Socioeconomic:</strong> Relative Wealth Index (Meta RWI), nighttime lights intensity, year-over-year change in nighttime lights (economic growth proxy).</p>
+          </div>
+          <div class="section">
+            <h2>Final Dataset</h2>
+            <p>We extract additional features: year-over-year change in nighttime lights (economic proxy) and temperature anomalies (deviations from long-term norms). The final dataset has 34,015 grid-year observations with ~92% non-conflict and 8% conflict. Data cleaning includes checking for missing values, consistent data types and units, and normalization where necessary. We use SMOTE to address class imbalance during training.</p>
+            <p><a href="#" class="cta-link" data-goto="viewer">Explore the data in the Viewer</a></p>
           </div>
         </div>
+      </section>
 
-        <div class="section">
-          <h2>Demo Video</h2>
-          <div class="video-placeholder">
-            <p><a href="#" id="video-link">[Video demo – coming soon]</a></p>
-            <p style="font-size: 0.85rem; margin-top: 0.5rem;">Replace the href when you have a demo video.</p>
+      <section class="tab-panel" id="panel-models">
+        <div class="container">
+          <div class="section">
+            <h2>Why Multiple Models?</h2>
+            <p>We compare linear and non-linear approaches because conflict prediction involves both interpretable drivers (e.g., wealth, climate) and complex spatial patterns. No single model dominates: logistic regression offers interpretability, KNN captures geography, random forest provides feature importance, and neural networks learn non-linear interactions. Our Conservative ensemble balances these strengths for early-warning applications where both recall and precision matter.</p>
+          </div>
+
+          <div class="model-block">
+            <h3>1. Logistic Regression (ElasticNet)</h3>
+            <p>Interpretable baseline. We model conflict probability via the sigmoid of a linear combination of features:</p>
+            <div class="equation-block" data-math="P(y_i = 1 \mid x_i) = \sigma(w^\top x_i + b) = \frac{1}{1 + e^{-(w^\top x_i + b)}}"></div>
+            <p>We minimize the negative log-likelihood plus ElasticNet regularization:</p>
+            <div class="equation-block" data-math="\ell(w,b) = -\sum_{i=1}^n \log \sigma(y_i(w^\top x_i + b)) + \lambda\left[\alpha\sum_j |w_j| + (1-\alpha)\sum_j w_j^2\right]"></div>
+            <p>Hyperparameters: C (inverse penalty strength), α (L1/L2 mix). Best: α=0 (L2 only), C=10.</p>
+          </div>
+
+          <div class="model-block">
+            <h3>2. K-Nearest Neighbors</h3>
+            <p>Geography-based: conflict tends to cluster. We select the k nearest neighbors \(S_k\) by distance, then assign the majority class with distance-weighted voting:</p>
+            <div class="equation-block" data-math="\hat{y}_i = \arg\max_c \sum_{j \in S_k} w_j \cdot \mathbb{I}_{y_j=c}"></div>
+            <p>Distance metrics: Euclidean \(D_{\text{euc}}(x_i,x_j) = \sqrt{\sum_m (x_{im}-x_{jm})^2}\) or cosine similarity. Best: k=3, cosine similarity, distance weights \(w_j = 1/d_j\).</p>
+          </div>
+
+          <div class="model-block">
+            <h3>3. Random Forest</h3>
+            <p>Ensemble of B decision trees trained on bootstrapped samples with random feature subsets. Final prediction by majority vote:</p>
+            <div class="equation-block" data-math="\hat{y} = \text{mode}\{T_1(x), T_2(x), \ldots, T_B(x)\}"></div>
+            <p>Conflict probability:</p>
+            <div class="equation-block" data-math="P(\text{conflict}_i=1 \mid x_i) = \frac{1}{B}\sum_{b=1}^B \mathbb{I}(T_b(x_i)=1)"></div>
+            <p>Best: 500 trees, unlimited depth. Feature importance via Gini impurity.</p>
+          </div>
+
+          <div class="model-block">
+            <h3>4. Neural Network</h3>
+            <p>Fully connected 64 → 32 → 1 with ReLU and sigmoid output:</p>
+            <div class="equation-block" data-math="h_1 = \text{ReLU}(W_1 x + b_1),\quad h_2 = \text{ReLU}(W_2 h_1 + b_2),\quad P(\text{conflict})= \sigma(W_3 h_2 + b_3)"></div>
+            <p>Binary Cross-Entropy loss:</p>
+            <div class="equation-block" data-math="\mathcal{L} = -\frac{1}{n}\sum_{i=1}^n \left[y_i \log \hat{y}_i + (1-y_i)\log(1-\hat{y}_i)\right]"></div>
+            <p>SGD with momentum 0.9, 100 epochs, batch size 128.</p>
+          </div>
+
+          <div class="model-block">
+            <h3>5. Conservative Ensemble</h3>
+            <p>Weighted average of predicted probabilities, threshold 0.5 for classification:</p>
+            <div class="equation-block" data-math="\hat{p} = 0.30\, p_{\text{LR}} + 0.25\, p_{\text{KNN}} + 0.35\, p_{\text{RF}} + 0.10\, p_{\text{NN}}"></div>
+          </div>
+
+          <div class="section">
+            <h2>Results</h2>
+            <div class="results-callout">
+              <p><strong>Conservative ensemble:</strong> 72.3% recall, 52.0% precision, 92.3% accuracy. Environmental stressors and socioeconomic conditions meaningfully predict conflict. The precision-recall tradeoff reflects the challenge of early-warning systems: balancing detection with operational feasibility.</p>
+            </div>
+          </div>
+
+          <div class="section">
+            <h2>Demo Video</h2>
+            <div class="video-placeholder">
+              <p><a href="#" id="video-link">[Video demo – coming soon]</a></p>
+              <p style="font-size: 0.85rem; margin-top: 0.5rem;">Replace the href when you have a demo video.</p>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- Full Report -->
-    <section class="tab-panel" id="panel-report">
-      <div class="report-wrapper">
-        <iframe src="full_report.html" title="Full Report" class="report-iframe"></iframe>
-      </div>
-    </section>
-
-    <!-- Viewer -->
-    <section class="tab-panel" id="panel-viewer">
-      <div class="viewer-wrapper">
-        <nav class="viewer-subtabs">
-          <button class="viewer-subtab active" data-viewer="input">Input Data</button>
-          <button class="viewer-subtab" data-viewer="predictions">Predictions</button>
-        </nav>
-        <div class="viewer-subpanel active" id="viewer-panel-input">
-          <iframe src="kepler_input.html" title="Input Data - Kepler Map"></iframe>
+      <section class="tab-panel" id="panel-report">
+        <div class="report-wrapper">
+          <iframe src="full_report.html" title="Full Report" class="report-iframe"></iframe>
         </div>
-        <div class="viewer-subpanel" id="viewer-panel-predictions">
-          <iframe src="kepler_predictions.html" title="Predictions - Kepler Map"></iframe>
-        </div>
-      </div>
-    </section>
-  </main>
+      </section>
 
-  <footer>
-    <p>Predicting Conflict in Africa: A Machine Learning Approach Using Environmental Stressors</p>
-    <p>University of Chicago, Harris School of Public Policy</p>
-  </footer>
+      <section class="tab-panel" id="panel-viewer">
+        <div class="viewer-wrapper">
+          <nav class="viewer-subtabs">
+            <button class="viewer-subtab active" data-viewer="input">Input Data</button>
+            <button class="viewer-subtab" data-viewer="predictions">Predictions</button>
+          </nav>
+          <div class="viewer-subpanel active" id="viewer-panel-input">
+            <iframe src="kepler_input.html" title="Input Data - Kepler Map"></iframe>
+          </div>
+          <div class="viewer-subpanel" id="viewer-panel-predictions">
+            <iframe src="kepler_predictions.html" title="Predictions - Kepler Map"></iframe>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>Predicting Conflict in Africa: A Machine Learning Approach Using Environmental Stressors</p>
+      <p>University of Chicago, Harris School of Public Policy</p>
+    </footer>
+  </div>
 
   <script>
-    // Tabs
     document.querySelectorAll('.tab').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
@@ -468,7 +513,6 @@
       });
     });
 
-    // CTA: goto Viewer
     document.querySelectorAll('[data-goto="viewer"]').forEach(el => {
       el.addEventListener('click', (e) => {
         e.preventDefault();
@@ -476,14 +520,12 @@
       });
     });
 
-    // KaTeX for equations
     document.querySelectorAll('.equation-block[data-math]').forEach(el => {
       try {
         katex.render(el.dataset.math, el, { displayMode: true, throwOnError: false });
       } catch (e) { el.textContent = el.dataset.math; }
     });
 
-    // Viewer sub-tabs
     document.querySelectorAll('.viewer-subtab').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.viewer-subtab').forEach(b => b.classList.remove('active'));
