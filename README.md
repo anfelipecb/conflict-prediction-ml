@@ -97,12 +97,16 @@ project-aeyzaguirre-phernandezpedraz-afcamachob/
 │   ├── conflicts_africa_country.png  # Conflict distribution by country
 │   └── Data_Africa.png               # Spatial data visualization
 │
-└── training/                          # Model training notebooks
-    ├── random_forest.ipynb           
-    ├── comparison_models_ensemble.ipynb # Model comparison and ensemble
-    └── k_nearestneighbors.ipynb 
-    └── neural_networks.ipynb 
-    └── logistic_regression.ipynb 
+├── src/
+│   └── conflict_project/              # Python package (importable code)
+│       └── training/
+│           ├── train.py               # Training helpers
+│           └── notebooks/             # Per-model training notebooks
+│               ├── logistic_regression.ipynb
+│               ├── k_nearestneighbors.ipynb
+│               ├── random_forest.ipynb
+│               ├── neural_networks.ipynb
+│               └── comparison_models_ensemble.ipynb
 
 ```
 
@@ -187,8 +191,7 @@ Writes `milestones/milestone_6/final_doc.pdf` and copies to `notebooks/final_doc
 The [`latex/`](latex/) folder contains `main.tex`, `references.bib`, and a Makefile. Build with `latexmk -pdf main.tex` or `make -C latex` (requires TeX Live / MacTeX and `biber`). See [`latex/README.md`](latex/README.md). Figures load from [`output/`](output/) (LR/KNN matrices: `LR_confussion.png`, `KNN_confussion.png`; see [`output/README.txt`](output/README.txt)).
 
 ### Model Training
-- Individual models: See `training/` directory
-- Ensemble comparison: `training/comparison_models_ensemble.ipynb`
+- Individual models and ensemble comparison: [`src/conflict_project/training/notebooks/`](src/conflict_project/training/notebooks/) (e.g. `comparison_models_ensemble.ipynb`). Data path resolution uses [`src/conflict_project/repo_paths.py`](src/conflict_project/repo_paths.py) (`training_parquet_path()`), so you can run Jupyter from any working directory under the repo as long as `pyproject.toml` is discoverable upward from `Path.cwd()`.
 
 ### Data Processing
 - Raw data processing scripts in `conflict_climate/`
