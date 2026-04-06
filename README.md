@@ -20,7 +20,7 @@ Static site source lives under [`docs/`](docs/) (same HTML for every host below)
 
 ### Kepler predictions map (`kepler_predictions.json`)
 
-The **Predictions** tab loads [`docs/data/map/kepler_predictions.json`](docs/data/map/kepler_predictions.json). It is built from the **same pipeline as the notebooks**: `load_and_preprocess_data` → Conservative ensemble `predict` → GeoPandas join to [`data/output/Africa_grid_50km.geojson`](data/output/Africa_grid_50km.geojson), then [`docs/data/map/ensemble_predictions.geojson`](docs/data/map/ensemble_predictions.geojson) plus a Kepler config that **only** colors by `ensemble_prob` (one layer; no input-variable styling).
+The **Predictions** tab loads [`docs/kepler_predictions.html`](docs/kepler_predictions.html) (full-bleed Kepler iframe) using [`docs/data/map/kepler_predictions.json`](docs/data/map/kepler_predictions.json). Export pipeline: `load_and_preprocess_data` → ensemble `predict` → GeoPandas join with **only** `GEOID`, `year`, `ensemble_prob`, `ensemble_pred`, and geometry (grid columns trimmed to `GEOID` + geometry). Kepler layer: **ensemble_prob**, quantile scale, ramp **#2C1E3D → #EDD1CA**. [`ensemble_predictions.geojson`](docs/data/map/ensemble_predictions.geojson) is the same attributes (large file; GitHub 100 MB limit may require LFS or omitting from Git).
 
 ```bash
 uv run python scripts/export_kepler_predictions.py
@@ -29,6 +29,11 @@ uv run python scripts/export_kepler_predictions.py --from-geojson docs/data/map/
 ```
 
 Requires `data/output/grid_conflict_climate_2019_23.parquet` and `models/ensemble/`. The GitHub Actions deploy runs this with `|| true` when artifacts are missing. Commit updated `kepler_predictions.json` / `ensemble_predictions.geojson` after local runs if you want the live site to match (watch GitHub’s file size limits).
+
+**Shareable URLs (after deploy):** On GitHub Pages, predictions-only GeoJSON is at  
+`https://<user>.github.io/<repo>/data/map/ensemble_predictions.geojson`  
+(Vercel: `https://<project>.vercel.app/data/map/ensemble_predictions.geojson`).  
+Open [kepler.gl demo](https://kepler.gl/demo), **Add data → Load from URL**, paste that link, then style by `ensemble_prob` (quantile, same ramp as above).
 
 ### How GitHub Pages deployment works
 

@@ -15,19 +15,19 @@ from conflict_project.config import PROJECT_ROOT
 
 SHELL_PATH = PROJECT_ROOT / "data" / "map" / "kepler_map_shell.json"
 
-# Dark cool → teal → amber → red (low → high P(conflict))
+# Quantile ramp: low P(conflict) → high (matches predictions viewer strip)
 ENSEMBLE_COLOR_RANGE = {
-    "name": "ensemble_conflict_probability",
+    "name": "ensemble_prob_quantile",
     "type": "sequential",
     "category": "Custom",
     "colors": [
-        "#0b132b",
-        "#1b4965",
-        "#2a6f97",
-        "#5bc0be",
-        "#ffc857",
-        "#ff6b35",
-        "#c1121f",
+        "#2C1E3D",
+        "#3F2F4A",
+        "#5A4A5E",
+        "#756572",
+        "#958B88",
+        "#B8B0A8",
+        "#EDD1CA",
     ],
 }
 
@@ -46,7 +46,7 @@ def gdf_to_kepler_all_data(gdf: gpd.GeoDataFrame) -> list:
     for _, row in gdf.iterrows():
         geoid = int(row["GEOID"])
         year = int(row["year"])
-        prob = float(row["ensemble_prob"])
+        prob = round(float(row["ensemble_prob"]), 4)
         pred = int(row["ensemble_pred"])
         props = {
             "GEOID": geoid,
@@ -67,7 +67,7 @@ def _prediction_layer(dataset_id: str, template_layer: dict) -> dict:
     layer = copy.deepcopy(template_layer)
     layer["id"] = "ensemble_predictions_layer"
     layer["config"]["dataId"] = dataset_id
-    layer["config"]["label"] = "Ensemble P(conflict)"
+    layer["config"]["label"] = "ensemble_prob (quantile)"
     layer["config"]["hidden"] = False
     vc = layer.setdefault("visualChannels", {})
     vc["colorField"] = {"name": "ensemble_prob", "type": "real"}
@@ -127,8 +127,8 @@ def build_predictions_kepler_document(gdf: gpd.GeoDataFrame, dataset_id: str = "
             **shell.get("info", {}),
             "title": "Africa 50km grid — ensemble predictions",
             "description": (
-                "Conservative ensemble predicted probability of conflict (0–1) per grid cell and year. "
-                "Same feature matrix and models as training/comparison_models_ensemble.ipynb."
+                "ensemble_prob (quantile), colors #2C1E3D–#EDD1CA. "
+                "Properties: GEOID, year, ensemble_prob, ensemble_pred."
             ),
         },
     }
@@ -141,19 +141,25 @@ def predictions_gdf_from_scores(
     preds: np.ndarray,
     grid_path: Path,
 ) -> gpd.GeoDataFrame:
-    """Join model scores to grid polygons (GeoPandas), same rows as notebook scoring."""
+    """Join model scores to grid polygons. Only GEOID, year, ensemble_*, geometry (no extra grid attrs)."""
     df = pd.DataFrame(
         {
             "GEOID": keys["GEOID"].to_numpy(),
             "year": keys["year"].to_numpy(),
-            "ensemble_prob": probs,
+            "ensemble_prob": np.round(probs.astype(np.float64), 4),
             "ensemble_pred": preds.astype(int),
         }
     )
     grid = gpd.read_file(grid_path)
+    if "GEOID" not in grid.columns:
+        raise ValueError(f"Grid must have GEOID column; got {list(grid.columns)}")
+    grid = grid[["GEOID", "geometry"]].copy()
     merged = df.merge(grid, on="GEOID", how="left")
     if merged["geometry"].isna().any():
         bad = int(merged["geometry"].isna().sum())
         merged = merged.dropna(subset=["geometry"])
         print(f"Warning: dropped {bad} rows with no matching grid geometry for GEOID")
-    return gpd.GeoDataFrame(merged, geometry="geometry", crs=grid.crs)
+    out = gpd.GeoDataFrame(merged, geometry="geometry", crs=grid.crs)
+    return out[
+        ["GEOID", "year", "ensemble_prob", "ensemble_pred", "geometry"]
+    ]
