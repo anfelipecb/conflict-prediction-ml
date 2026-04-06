@@ -11,6 +11,10 @@ OUTPUT_DIR = PROJECT_ROOT / "output"
 PARQUET_PATH = DATA_DIR / "output" / "grid_conflict_climate_2019_23.parquet"
 GRID_GEOJSON_PATH = DATA_DIR / "output" / "Africa_grid_50km.geojson"
 PREDICTIONS_GEOJSON_PATH = OUTPUT_DIR / "predictions.geojson"
+# Kepler (site): GeoPandas → GeoJSON + Kepler JSON under docs/
+DOCS_MAP_DIR = PROJECT_ROOT / "docs" / "data" / "map"
+ENSEMBLE_PREDICTIONS_GEOJSON_DOCS = DOCS_MAP_DIR / "ensemble_predictions.geojson"
+KEPLER_PREDICTIONS_JSON_DOCS = DOCS_MAP_DIR / "kepler_predictions.json"
 
 # Model artifacts
 MODELS_DIR = PROJECT_ROOT / "models"

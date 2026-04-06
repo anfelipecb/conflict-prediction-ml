@@ -1,11 +1,11 @@
 # LaTeX paper (publication-style PDF)
 
-Builds `main.pdf` from `main.tex` with **biblatex** + **biber**, **tcolorbox** (green callouts for references/links), and figures from `../output/`.
+Builds `main.pdf` from `main.tex` with **biblatex** + **biber**, **hyperref** (subtle PDF link borders on citations, cross-refs, and URLs), and figures from `../output/`.
 
 ## Requirements
 
 - TeX Live or MacTeX (`pdflatex`, `biber`, `latexmk`)
-- Packages: `tcolorbox`, `biblatex`, `microtype`, etc. (standard in full TeX Live)
+- Packages: `biblatex`, `hyperref`, `xurl`, `microtype`, etc. (standard in full TeX Live)
 
 ## Build
 
@@ -22,10 +22,9 @@ Paths are `../output/<name>.png` relative to this folder. The repo uses these fi
 
 - `ROC_Models.png`, `Precision_Recall.png` (capital letters as shown)
 - `confusion_RF.png` / `confusion_NN.png` are **symlinks** to `confussion_RF.png` / `confussion_NN.png` (historic spelling)
-- **`confusion_LR.png`** and **`confusion_KNN.png`** must be exported from the training notebooks into `output/` (they are not in the repo yet); the PDF shows a clear missing-figure box until you add them.
+- Logistic regression and K-NN matrices: **`LR_confussion.png`**, **`KNN_confussion.png`** (same spelling convention as RF/NN). Optional symlinks `confusion_LR.png` → `LR_confussion.png` and `confusion_KNN.png` → `KNN_confussion.png` keep older paths working.
 
 ## Editing
 
 - Main text: `main.tex`
 - Bibliography: `references.bib`
-- Green “key papers” box: `keypapers` environment; replication link: `linkbox`

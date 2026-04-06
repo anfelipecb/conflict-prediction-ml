@@ -1,0 +1,450 @@
+{
+  "config": {
+    "version": "v1",
+    "config": {
+      "visState": {
+        "filters": [],
+        "layers": [
+          {
+            "id": "dn5u46",
+            "type": "geojson",
+            "config": {
+              "dataId": "ed1xyb",
+              "columnMode": "geojson",
+              "label": "new layer",
+              "color": [
+                18,
+                147,
+                154
+              ],
+              "highlightColor": [
+                252,
+                242,
+                26,
+                255
+              ],
+              "columns": {
+                "geojson": "_geojson"
+              },
+              "isVisible": true,
+              "visConfig": {
+                "opacity": 0.8,
+                "strokeOpacity": 0.8,
+                "thickness": 0.5,
+                "strokeColor": [
+                  255,
+                  255,
+                  255
+                ],
+                "colorRange": {
+                  "category": "Custom",
+                  "name": "color.customPalette.custom.conflict_count",
+                  "type": "custom",
+                  "colors": [
+                    "#4C0035",
+                    "#880030",
+                    "#B72F15",
+                    "#D6610A",
+                    "#EF9100",
+                    "#FFC300"
+                  ]
+                },
+                "strokeColorRange": {
+                  "name": "Global Warming",
+                  "type": "sequential",
+                  "category": "Uber",
+                  "colors": [
+                    "#4C0035",
+                    "#880030",
+                    "#B72F15",
+                    "#D6610A",
+                    "#EF9100",
+                    "#FFC300"
+                  ]
+                },
+                "radius": 10,
+                "sizeRange": [
+                  0,
+                  10
+                ],
+                "radiusRange": [
+                  0,
+                  50
+                ],
+                "heightRange": [
+                  0,
+                  500
+                ],
+                "elevationScale": 5,
+                "stroked": false,
+                "filled": true,
+                "enable3d": false,
+                "wireframe": false,
+                "fixedHeight": false
+              },
+              "hidden": false,
+              "textLabel": [
+                {
+                  "field": null,
+                  "color": [
+                    255,
+                    255,
+                    255
+                  ],
+                  "size": 18,
+                  "offset": [
+                    0,
+                    0
+                  ],
+                  "anchor": "start",
+                  "alignment": "center",
+                  "outlineWidth": 0,
+                  "outlineColor": [
+                    255,
+                    0,
+                    0,
+                    255
+                  ],
+                  "background": false,
+                  "backgroundColor": [
+                    0,
+                    0,
+                    200,
+                    255
+                  ]
+                }
+              ]
+            },
+            "visualChannels": {
+              "colorField": {
+                "name": "temp_deviation",
+                "type": "real"
+              },
+              "colorScale": "quantile",
+              "strokeColorField": null,
+              "strokeColorScale": "quantile",
+              "sizeField": null,
+              "sizeScale": "linear",
+              "heightField": null,
+              "heightScale": "linear",
+              "radiusField": null,
+              "radiusScale": "linear"
+            }
+          },
+          {
+            "id": "8iuanau",
+            "type": "geojson",
+            "config": {
+              "dataId": "ed1xyb",
+              "columnMode": "geojson",
+              "label": "grid_conflict_climate_2019_23_with_geometry",
+              "color": [
+                231,
+                159,
+                213
+              ],
+              "highlightColor": [
+                252,
+                242,
+                26,
+                255
+              ],
+              "columns": {
+                "geojson": "_geojson"
+              },
+              "isVisible": true,
+              "visConfig": {
+                "opacity": 0.8,
+                "strokeOpacity": 0.8,
+                "thickness": 0.5,
+                "strokeColor": [
+                  154,
+                  146,
+                  126
+                ],
+                "colorRange": {
+                  "name": "color.customPalette.customOrdinal.conflict_count",
+                  "type": "customOrdinal",
+                  "category": "Custom",
+                  "colors": [
+                    "#E6FAFA",
+                    "#C22E00"
+                  ],
+                  "colorMap": [
+                    [
+                      0,
+                      "#E6FAFA"
+                    ],
+                    [
+                      [
+                        1,
+                        10,
+                        103,
+                        108,
+                        11,
+                        12,
+                        122,
+                        126,
+                        13,
+                        134,
+                        14,
+                        15,
+                        16,
+                        17,
+                        18,
+                        19,
+                        2,
+                        20,
+                        21,
+                        22,
+                        23,
+                        24,
+                        25,
+                        26,
+                        27,
+                        28,
+                        29,
+                        3,
+                        30,
+                        304,
+                        31,
+                        32,
+                        33,
+                        34,
+                        35,
+                        36,
+                        37,
+                        38,
+                        39,
+                        4,
+                        40,
+                        41,
+                        42,
+                        43,
+                        44,
+                        46,
+                        47,
+                        48,
+                        49,
+                        5,
+                        52,
+                        53,
+                        54,
+                        55,
+                        56,
+                        59,
+                        6,
+                        60,
+                        62,
+                        64,
+                        65,
+                        66,
+                        67,
+                        68,
+                        69,
+                        7,
+                        72,
+                        75,
+                        8,
+                        81,
+                        82,
+                        88,
+                        9,
+                        93,
+                        95,
+                        99
+                      ],
+                      "#C22E00"
+                    ]
+                  ]
+                },
+                "strokeColorRange": {
+                  "name": "Global Warming",
+                  "type": "sequential",
+                  "category": "Uber",
+                  "colors": [
+                    "#4C0035",
+                    "#880030",
+                    "#B72F15",
+                    "#D6610A",
+                    "#EF9100",
+                    "#FFC300"
+                  ]
+                },
+                "radius": 10,
+                "sizeRange": [
+                  0,
+                  10
+                ],
+                "radiusRange": [
+                  0,
+                  50
+                ],
+                "heightRange": [
+                  0,
+                  500
+                ],
+                "elevationScale": 5,
+                "stroked": true,
+                "filled": true,
+                "enable3d": false,
+                "wireframe": false,
+                "fixedHeight": false
+              },
+              "hidden": false,
+              "textLabel": [
+                {
+                  "field": null,
+                  "color": [
+                    255,
+                    255,
+                    255
+                  ],
+                  "size": 18,
+                  "offset": [
+                    0,
+                    0
+                  ],
+                  "anchor": "start",
+                  "alignment": "center",
+                  "outlineWidth": 0,
+                  "outlineColor": [
+                    255,
+                    0,
+                    0,
+                    255
+                  ],
+                  "background": false,
+                  "backgroundColor": [
+                    0,
+                    0,
+                    200,
+                    255
+                  ]
+                }
+              ]
+            },
+            "visualChannels": {
+              "colorField": {
+                "name": "conflict_count",
+                "type": "integer"
+              },
+              "colorScale": "customOrdinal",
+              "strokeColorField": null,
+              "strokeColorScale": "quantile",
+              "sizeField": null,
+              "sizeScale": "linear",
+              "heightField": null,
+              "heightScale": "linear",
+              "radiusField": null,
+              "radiusScale": "linear"
+            }
+          }
+        ],
+        "effects": [],
+        "interactionConfig": {
+          "tooltip": {
+            "fieldsToShow": {
+              "ed1xyb": [
+                {
+                  "name": "GEOID",
+                  "format": null
+                },
+                {
+                  "name": "year",
+                  "format": null
+                },
+                {
+                  "name": "conflict_count",
+                  "format": null
+                },
+                {
+                  "name": "temp_mean",
+                  "format": null
+                },
+                {
+                  "name": "temp_max",
+                  "format": null
+                }
+              ]
+            },
+            "compareMode": false,
+            "compareType": "absolute",
+            "enabled": true
+          },
+          "brush": {
+            "size": 0.5,
+            "enabled": false
+          },
+          "geocoder": {
+            "enabled": false
+          },
+          "coordinate": {
+            "enabled": false
+          }
+        },
+        "layerBlending": "normal",
+        "overlayBlending": "normal",
+        "splitMaps": [],
+        "animationConfig": {
+          "currentTime": null,
+          "speed": 1
+        },
+        "editor": {
+          "features": [],
+          "visible": true
+        }
+      },
+      "mapState": {
+        "bearing": 0,
+        "dragRotate": false,
+        "latitude": 3.265882646618893,
+        "longitude": 19.016453442688157,
+        "pitch": 0,
+        "zoom": 2.676711497632822,
+        "isSplit": false,
+        "isViewportSynced": true,
+        "isZoomLocked": false,
+        "splitMapViewports": []
+      },
+      "mapStyle": {
+        "styleType": "dark-matter",
+        "topLayerGroups": {},
+        "visibleLayerGroups": {
+          "label": true,
+          "road": true,
+          "border": false,
+          "building": true,
+          "water": true,
+          "land": true,
+          "3d building": false
+        },
+        "threeDBuildingColor": [
+          15.035172933000911,
+          15.035172933000911,
+          15.035172933000911
+        ],
+        "backgroundColor": [
+          0,
+          0,
+          0
+        ],
+        "mapStyles": {}
+      },
+      "uiState": {
+        "mapControls": {
+          "mapLegend": {
+            "active": false
+          }
+        }
+      }
+    }
+  },
+  "info": {
+    "app": "kepler.gl",
+    "created_at": "Mon Apr 06 2026 16:35:24 GMT-0500 (Central Daylight Time)",
+    "title": "keplergl_fz5ge1i",
+    "description": "",
+    "source": "kepler.gl"
+  }
+}

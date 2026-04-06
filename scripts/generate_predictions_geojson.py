@@ -1,54 +1,37 @@
 #!/usr/bin/env python3
 """
-Generate predictions GeoJSON for Kepler.gl visualization.
+Generate predictions GeoJSON via GeoPandas (same scoring as notebooks / Kepler export).
 
-Reads the parquet data, runs the Conservative ensemble, and writes a GeoJSON
-with conflict probability per grid cell. Requires trained models in models/ensemble/.
+Joins Conservative ensemble scores to the Africa grid on GEOID; includes ``year`` per row.
+Writes ``output/predictions.geojson`` with columns ``ensemble_prob`` and ``ensemble_pred``.
 """
 
 import argparse
 import sys
 from pathlib import Path
 
-# Add project root for imports
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
 import geopandas as gpd
-import pandas as pd
 
+from conflict_project.config import (
+    ENSEMBLE_ARTIFACTS_DIR,
+    GRID_GEOJSON_PATH,
+    PARQUET_PATH,
+    PREDICTIONS_GEOJSON_PATH,
+)
 from conflict_project.data import load_and_preprocess_data
 from conflict_project.inference import load_ensemble_artifacts, predict
-from conflict_project.config import (
-    PARQUET_PATH,
-    GRID_GEOJSON_PATH,
-    PREDICTIONS_GEOJSON_PATH,
-    ENSEMBLE_ARTIFACTS_DIR,
-)
+from conflict_project.kepler_export import predictions_gdf_from_scores
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Generate predictions GeoJSON for Kepler.gl")
-    parser.add_argument(
-        "--parquet",
-        default=str(PARQUET_PATH),
-        help="Path to grid_conflict_climate parquet",
-    )
-    parser.add_argument(
-        "--grid",
-        default=str(GRID_GEOJSON_PATH),
-        help="Path to Africa grid GeoJSON",
-    )
-    parser.add_argument(
-        "--output",
-        default=str(PREDICTIONS_GEOJSON_PATH),
-        help="Output GeoJSON path",
-    )
-    parser.add_argument(
-        "--models",
-        default=str(ENSEMBLE_ARTIFACTS_DIR),
-        help="Path to ensemble artifacts directory",
-    )
+    parser = argparse.ArgumentParser(description="Generate predictions GeoJSON (GeoPandas)")
+    parser.add_argument("--parquet", default=str(PARQUET_PATH), help="Grid-climate parquet")
+    parser.add_argument("--grid", default=str(GRID_GEOJSON_PATH), help="Africa grid GeoJSON")
+    parser.add_argument("--output", default=str(PREDICTIONS_GEOJSON_PATH), help="Output GeoJSON")
+    parser.add_argument("--models", default=str(ENSEMBLE_ARTIFACTS_DIR), help="Ensemble artifacts dir")
     args = parser.parse_args()
 
     parquet_path = Path(args.parquet)
@@ -63,31 +46,22 @@ def main():
         print(f"Error: Grid GeoJSON not found: {grid_path}")
         sys.exit(1)
     if not models_dir.exists():
-        print(f"Error: Models not found. Train first: uv run python -m conflict_project.training.train")
+        print("Error: Models not found. Train first: uv run python scripts/train_and_save.py")
         sys.exit(1)
 
-    print("Loading data...")
-    X, y, geoids = load_and_preprocess_data(str(parquet_path))
+    print("Loading data…")
+    X, _y, keys = load_and_preprocess_data(str(parquet_path))
     artifacts = load_ensemble_artifacts(str(models_dir))
+    X = X.reindex(columns=artifacts["feature_names"], fill_value=0)
 
-    print("Running predictions...")
+    print("Running predictions…")
     probs, preds = predict(X.values, artifacts)
 
-    df = pd.DataFrame({
-        "GEOID": geoids["GEOID"].values,
-        "conflict_prob": probs,
-        "conflict_pred": preds,
-    })
-
-    print("Loading grid geometry...")
-    grid = gpd.read_file(grid_path)
-    merged = grid.merge(df, on="GEOID", how="left")
-    merged["conflict_prob"] = merged["conflict_prob"].fillna(0)
-    merged["conflict_pred"] = merged["conflict_pred"].fillna(0).astype(int)
+    gdf = predictions_gdf_from_scores(keys, probs, preds, grid_path)
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    merged.to_file(output_path, driver="GeoJSON")
-    print(f"Wrote {output_path}")
+    gdf.to_file(output_path, driver="GeoJSON")
+    print(f"Wrote {output_path} ({len(gdf)} features)")
 
 
 if __name__ == "__main__":

@@ -1,98 +1,105 @@
 #!/usr/bin/env python3
 """
-Merge Conservative ensemble probabilities into a Kepler.gl export and write
-docs/data/map/kepler_predictions.json for the site viewer.
+Build Kepler predictions map from the same pipeline as the training notebooks:
+
+  load_and_preprocess_data → Conservative ensemble predict → GeoPandas join to grid
+  → ensemble_predictions.geojson + kepler_predictions.json
 
 Requires:
-  - data/output/grid_conflict_climate_2019_23.parquet (run conflict_climate pipeline)
-  - models/ensemble/* (run: uv run python scripts/train_and_save.py)
-  - data/map/kepler.gl.json (base map; copied to docs/data/map/ for hosting)
+  - data/output/grid_conflict_climate_2019_23.parquet
+  - data/output/Africa_grid_50km.geojson
+  - models/ensemble/* (uv run python scripts/train_and_save.py)
+  - data/map/kepler_map_shell.json (checked in; extracted from kepler.gl.json)
+
+Usage:
+  uv run python scripts/export_kepler_predictions.py
+  uv run python scripts/export_kepler_predictions.py --from-geojson docs/data/map/ensemble_predictions.geojson
 """
 
 from __future__ import annotations
 
+import argparse
 import json
 import sys
 from pathlib import Path
 
-import pandas as pd
+import geopandas as gpd
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
-from conflict_project.config import ENSEMBLE_ARTIFACTS_DIR, PARQUET_PATH
-from conflict_project.inference import load_ensemble_artifacts, predict
-
-
-def feature_matrix_from_parquet(path: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """Same encoding as training (load_and_preprocess_data) with GEOID/year keys."""
-    df = pd.read_parquet(path)
-    df = df.dropna()
-    df["target"] = (df["conflict_count"] >= 1).astype(int)
-    keys = df[["GEOID", "year"]].copy()
-    features = df.drop(["GEOID", "conflict_count", "target"], axis=1)
-    features = pd.get_dummies(features, columns=["year"], prefix="year")
-    return features, keys
+from conflict_project.config import (  # noqa: E402
+    ENSEMBLE_PREDICTIONS_GEOJSON_DOCS,
+    GRID_GEOJSON_PATH,
+    KEPLER_PREDICTIONS_JSON_DOCS,
+    PARQUET_PATH,
+    ENSEMBLE_ARTIFACTS_DIR,
+)
+from conflict_project.data import load_and_preprocess_data  # noqa: E402
+from conflict_project.inference import load_ensemble_artifacts, predict  # noqa: E402
+from conflict_project.kepler_export import (  # noqa: E402
+    build_predictions_kepler_document,
+    predictions_gdf_from_scores,
+)
 
 
 def main() -> None:
-    parquet = Path(PARQUET_PATH)
-    if not parquet.is_file():
-        print(f"Missing parquet: {parquet}")
-        sys.exit(1)
+    parser = argparse.ArgumentParser(description="Export Kepler predictions map (GeoPandas pipeline)")
+    parser.add_argument(
+        "--from-geojson",
+        type=Path,
+        metavar="PATH",
+        help="Only rebuild kepler_predictions.json from an existing ensemble_predictions GeoJSON",
+    )
+    args = parser.parse_args()
 
-    meta_path = ENSEMBLE_ARTIFACTS_DIR / "metadata.joblib"
-    if not meta_path.is_file():
-        print(f"Missing ensemble artifacts. Train first: uv run python scripts/train_and_save.py")
-        sys.exit(1)
+    out_gj = ENSEMBLE_PREDICTIONS_GEOJSON_DOCS
+    out_kepler = KEPLER_PREDICTIONS_JSON_DOCS
+    out_gj.parent.mkdir(parents=True, exist_ok=True)
 
-    print("Loading features…")
-    X, keys = feature_matrix_from_parquet(parquet)
-    artifacts = load_ensemble_artifacts()
-    feature_names = artifacts["feature_names"]
-    X = X.reindex(columns=feature_names, fill_value=0)
+    if args.from_geojson:
+        path = args.from_geojson
+        if not path.is_file():
+            print(f"Not found: {path}")
+            sys.exit(1)
+        print(f"Loading {path}…")
+        gdf = gpd.read_file(path)
+        for col in ("ensemble_prob", "ensemble_pred", "GEOID", "year"):
+            if col not in gdf.columns:
+                print(f"GeoJSON must include column: {col}")
+                sys.exit(1)
+    else:
+        parquet = Path(PARQUET_PATH)
+        if not parquet.is_file():
+            print(f"Missing parquet: {parquet}")
+            sys.exit(1)
+        meta = ENSEMBLE_ARTIFACTS_DIR / "metadata.joblib"
+        if not meta.is_file():
+            print("Missing models/ensemble/. Train: uv run python scripts/train_and_save.py")
+            sys.exit(1)
+        grid = Path(GRID_GEOJSON_PATH)
+        if not grid.is_file():
+            print(f"Missing grid: {grid}")
+            sys.exit(1)
 
-    print("Running ensemble predictions…")
-    probs, preds = predict(X.values, artifacts)
+        print("Loading data (same preprocessing as training)…")
+        X, _y, keys = load_and_preprocess_data(str(parquet))
+        artifacts = load_ensemble_artifacts()
+        X = X.reindex(columns=artifacts["feature_names"], fill_value=0)
 
-    lookup: dict[tuple[int, int], tuple[float, int]] = {}
-    for i in range(len(keys)):
-        row = keys.iloc[i]
-        lookup[(int(row["GEOID"]), int(row["year"]))] = (float(probs[i]), int(preds[i]))
+        print("Running Conservative ensemble…")
+        probs, preds = predict(X.values, artifacts)
 
-    base = PROJECT_ROOT / "data" / "map" / "kepler.gl.json"
-    if not base.is_file():
-        base = PROJECT_ROOT / "docs" / "data" / "map" / "kepler.gl.json"
-    if not base.is_file():
-        print(f"Missing Kepler base JSON: data/map/kepler.gl.json")
-        sys.exit(1)
+        print("Building GeoDataFrame (grid + scores)…")
+        gdf = predictions_gdf_from_scores(keys, probs, preds, grid)
+        print(f"Writing {out_gj} ({len(gdf)} features)…")
+        gdf.to_file(out_gj, driver="GeoJSON")
 
-    out = PROJECT_ROOT / "docs" / "data" / "map" / "kepler_predictions.json"
-
-    print(f"Loading Kepler config from {base}…")
-    with open(base, encoding="utf-8") as f:
-        doc = json.load(f)
-
-    all_data = doc["datasets"][0]["data"]["allData"]
-    matched = 0
-    for row in all_data:
-        feat = row[0]
-        props = feat["properties"]
-        key = (int(props["GEOID"]), int(props["year"]))
-        if key in lookup:
-            p, pbin = lookup[key]
-            props["ensemble_prob"] = round(p, 6)
-            props["ensemble_pred"] = int(pbin)
-            matched += 1
-        else:
-            props["ensemble_prob"] = None
-            props["ensemble_pred"] = None
-
-    out.parent.mkdir(parents=True, exist_ok=True)
-    print(f"Writing {out} (matched {matched} / {len(all_data)} features)…")
-    with open(out, "w", encoding="utf-8") as f:
+    print("Building Kepler.gl JSON (predictions-only layer, color = ensemble_prob)…")
+    doc = build_predictions_kepler_document(gdf)
+    with open(out_kepler, "w", encoding="utf-8") as f:
         json.dump(doc, f, separators=(",", ":"))
-
+    print(f"Wrote {out_kepler}")
     print("Done.")
 
 

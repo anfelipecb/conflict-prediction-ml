@@ -1,13 +1,14 @@
 Figures referenced from milestones/milestone_6/final_doc.ipynb as ../../output/*.png
 The static site copies PNGs to docs/output/ so full_report.html can use paths like output/Data_Africa.png (see GitHub Actions deploy step).
-For filenames: confusion_RF.png and confusion_NN.png in this folder are symlinks to confussion_RF.png / confussion_NN.png. Export confusion_LR.png and confusion_KNN.png from the training notebooks if missing (required for notebook + LaTeX paper).
+For filenames: confusion_RF.png and confusion_NN.png are symlinks to confussion_RF.png / confussion_NN.png. LR and K-NN matrices are LR_confussion.png and KNN_confussion.png; optional symlinks confusion_LR.png and confusion_KNN.png may point to those files.
 
 Generate them by running the training EDA notebooks and saving with these filenames:
   conflicts_africa_89-23.png
   conflicts_africa_country.png
   Data_Africa.png
-  confusion_LR.png
-  confusion_KNN.png
+  LR_confussion.png
+  KNN_confussion.png
+  (optional: confusion_LR.png, confusion_KNN.png as symlinks)
   confusion_RF.png
   RF_Importance.png
   confusion_NN.png

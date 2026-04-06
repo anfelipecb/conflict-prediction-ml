@@ -22,7 +22,7 @@ def load_and_preprocess_data(parquet_path: str | None = None):
     X = features
     y = df["target"]
 
-    return X, y, df[["GEOID"]]
+    return X, y, df[["GEOID", "year"]]
 
 
 def prepare_data_splits(X, y, test_size=0.2, random_state=42):

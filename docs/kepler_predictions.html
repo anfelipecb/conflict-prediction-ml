@@ -30,7 +30,7 @@
   </style>
 </head>
 <body>
-  <p class="kepler-hint">Kepler.gl may take up to a minute to load; wait for the map.</p>
+  <p class="kepler-hint">Kepler.gl may take up to a minute to load; wait for the map. This view is <strong>ensemble predictions only</strong> (cell color = <code>ensemble_prob</code>), built from GeoPandas + the same models as the training notebooks.</p>
   <div id="frame-wrap"></div>
   <script>
     (function () {
@@ -51,7 +51,7 @@
           wrap.appendChild(iframe);
         })
         .catch(function () {
-          wrap.innerHTML = '<p class="msg">Predictions map file not found. Generate it locally: <code>uv run python scripts/export_kepler_predictions.py</code> (requires <code>data/output/grid_conflict_climate_2019_23.parquet</code> and trained models under <code>models/ensemble/</code>). That writes <code>docs/data/map/kepler_predictions.json</code>.</p>';
+          wrap.innerHTML = '<p class="msg">Predictions map file not found. Generate locally: <code>uv run python scripts/export_kepler_predictions.py</code> (writes <code>docs/data/map/ensemble_predictions.geojson</code> and <code>docs/data/map/kepler_predictions.json</code>; needs parquet + <code>models/ensemble/</code>). Or rebuild Kepler only: <code>--from-geojson docs/data/map/ensemble_predictions.geojson</code>.</p>';
         });
     })();
   </script>

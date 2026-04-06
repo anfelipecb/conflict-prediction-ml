@@ -20,13 +20,15 @@ Static site source lives under [`docs/`](docs/) (same HTML for every host below)
 
 ### Kepler predictions map (`kepler_predictions.json`)
 
-The **Predictions** tab in the Viewer loads [`docs/data/map/kepler_predictions.json`](docs/data/map/kepler_predictions.json), produced by merging ensemble scores into the Kepler export:
+The **Predictions** tab loads [`docs/data/map/kepler_predictions.json`](docs/data/map/kepler_predictions.json). It is built from the **same pipeline as the notebooks**: `load_and_preprocess_data` → Conservative ensemble `predict` → GeoPandas join to [`data/output/Africa_grid_50km.geojson`](data/output/Africa_grid_50km.geojson), then [`docs/data/map/ensemble_predictions.geojson`](docs/data/map/ensemble_predictions.geojson) plus a Kepler config that **only** colors by `ensemble_prob` (one layer; no input-variable styling).
 
 ```bash
 uv run python scripts/export_kepler_predictions.py
+# Rebuild Kepler JSON from an existing GeoJSON (no models):
+uv run python scripts/export_kepler_predictions.py --from-geojson docs/data/map/ensemble_predictions.geojson
 ```
 
-Requires `data/output/grid_conflict_climate_2019_23.parquet` and trained artifacts under `models/ensemble/`. The workflow runs the same command with `|| true` so CI still passes when those paths are absent; commit the JSON when you regenerate it locally (keep under GitHub’s 100 MB blob limit).
+Requires `data/output/grid_conflict_climate_2019_23.parquet` and `models/ensemble/`. The GitHub Actions deploy runs this with `|| true` when artifacts are missing. Commit updated `kepler_predictions.json` / `ensemble_predictions.geojson` after local runs if you want the live site to match (watch GitHub’s file size limits).
 
 ### How GitHub Pages deployment works
 
@@ -73,6 +75,8 @@ project-aeyzaguirre-phernandezpedraz-afcamachob/
 │       ├── final_doc.ipynb            # Final document with all analysis
 │
 ├── output/                            # Generated visualizations and results
+│   ├── LR_confussion.png              # Logistic regression confusion matrix
+│   ├── KNN_confussion.png             # K-NN confusion matrix
 │   ├── confussion_RF.png             # Random Forest confusion matrix
 │   ├── confussion_NN.png             # Neural Network confusion matrix
 │   ├── ROC_models.png                # ROC curves comparison
@@ -169,7 +173,7 @@ bash scripts/export_final_doc_pdf.sh
 Writes `milestones/milestone_6/final_doc.pdf` and copies to `notebooks/final_doc.pdf`. Requires a working `jupyter nbconvert` with the `webpdf` exporter and Chromium for Playwright.
 
 ### LaTeX paper (publication-style PDF)
-The [`latex/`](latex/) folder contains `main.tex`, `references.bib`, and a Makefile. Build with `latexmk -pdf main.tex` or `make -C latex` (requires TeX Live / MacTeX and `biber`). See [`latex/README.md`](latex/README.md). Figures load from [`output/`](output/) (see README there for `confusion_LR` / `confusion_KNN` filenames).
+The [`latex/`](latex/) folder contains `main.tex`, `references.bib`, and a Makefile. Build with `latexmk -pdf main.tex` or `make -C latex` (requires TeX Live / MacTeX and `biber`). See [`latex/README.md`](latex/README.md). Figures load from [`output/`](output/) (LR/KNN matrices: `LR_confussion.png`, `KNN_confussion.png`; see [`output/README.txt`](output/README.txt)).
 
 ### Model Training
 - Individual models: See `training/` directory
