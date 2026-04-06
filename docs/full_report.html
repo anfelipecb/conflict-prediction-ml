@@ -7584,9 +7584,9 @@ a.anchor-link {
 </ul>
 <p>To motivate our analysis, we provide a preliminary overview of our variable of interest (occurence of violent events in Africa). Between 1989 and 2023, the occurence of violent events across the continent was characterized by a sharp peak in 1994, followed by an intermittent decline through 2006, and culminated by a steady increase from 2010 onwards (Graph 1). Throughout this entire period, 13 out of the 46 countries in the dataset comprised the majority of violent events, with the DR Congo, Nigeria and Somalia making up more than one-third of all records (Graph 2).</p>
 <p><strong>Graph 1: Number of conflicts in Africa during 1989-2023</strong></p>
-<p><img alt="N_Conflicts" src="../../output/conflicts_africa_89-23.png"/></p>
+<p><img alt="N_Conflicts" src="output/conflicts_africa_89-23.png"/></p>
 <p><strong>Graph 2: Countries with most conflicts 1989-2023</strong></p>
-<p><img alt="Conflict_Distribution" src="../../output/conflicts_africa_country.png"/></p>
+<p><img alt="Conflict_Distribution" src="output/conflicts_africa_country.png"/></p>
 </div>
 </div>
 </div>
@@ -7652,7 +7652,7 @@ a.anchor-link {
 <h3 id="3.-Final-Dataset-for-training"><strong>3. Final Dataset for training</strong><a class="anchor-link" href="#3.-Final-Dataset-for-training">¶</a></h3><p>Our final dataset represents a comprehensive spatio-temporal structure with 34,015 observations, where each row corresponds to a unique grid-year combination covering 50km x 50km geographic cells across the African continent from 2019 to 2023. This longitudinal design captures the temporal evolution of environmental, socioeconomic, and conflict dynamics within each geographic unit, enabling our models to learn from both spatial patterns and temporal trends. Each grid cell contains rich multidimensional information including climate variables (temperature, precipitation, surface pressure), forest cover changes, nighttime light intensity as an economic proxy, wealth indicators, and critically, historical conflict accumulation that serves as a temporal memory feature.</p>
 <p>The dataset exhibits significant class imbalance characteristic of conflict data, with approximately 92% of grid-year observations labeled as non-conflict (label = 0) and only 8% experiencing conflict events (label = 1). This imbalance reflects the reality that violent conflicts, while impactful, are relatively rare events spatially and temporally. To address this challenge in our modeling approach, we implement SMOTE (Synthetic Minority Oversampling Technique) during training to generate synthetic conflict examples, ensuring our models can effectively learn patterns from the minority class without simply defaulting to predicting the majority class. This temporal-spatial structure allows our models to capture both geographic clustering of conflicts and their persistence over time, which are key characteristics of conflict dynamics in Africa.</p>
 <p>Below we polotted a map with the conflict data aggregated for 2023 (left) and the temperature anomalies, deviations from the long term mean, for that year (right)</p>
-<p><img alt="Africa Conflict" src="../../output/Data_Africa.png"/></p>
+<p><img alt="Africa Conflict" src="output/Data_Africa.png"/></p>
 <p>And here we created an interactive map to further explore the feautres we are analyzing:
 <a href="https://kepler.gl/demo/map?mapUrl=https://dl.dropboxusercontent.com/scl/fi/449vmh78060v9r8bg8ke8/keplergl_9f33hj3.json?rlkey=tlnhjfvwa6lsy4pa9s24z9m8r&amp;dl=0">"Link to interactive map"</a></p>
 </div>
@@ -7914,10 +7914,10 @@ Cross-validation is a statistical method used to assess how well our model gener
 \text{Weighted avg} &amp; 0.94 &amp; 0.93 &amp; 0.94 &amp; 6803 \\
 \end{array}
 $$</p>
-<p><img alt="Random Forest Confusion Matrix" src="../../output/confussion_RF.png"/></p>
+<p><img alt="Random Forest Confusion Matrix" src="output/confussion_RF.png"/></p>
 <p>The cross-validation process not only optimized performance but also provided insights into model stability. The relatively small standard deviation across folds (σ = 0.03 for recall) indicates robust performance. Additionally, below we can see the importance of features from the random forest model, as it calculates feature importance by measuring how much each feature decreases node impurity when doing the splits across all trees in the forest. Features with largest reduction in impurity are considered most important, as they provide the most information gain. Random Forest's feature importance mechanism revealed that historical conflict patterns (<code>accumulated_conflicts</code>) and temperature variables (<code>surface presure (sp) and temperature</code>) were the most predictive features, consistently ranking high across all CV folds.</p>
 <p><strong>Feature imporance</strong></p>
-<p><img alt="Random Forest Importance" src="../../output/RF_Importance.png"/></p>
+<p><img alt="Random Forest Importance" src="output/RF_Importance.png"/></p>
 </div>
 </div>
 </div>
@@ -8014,7 +8014,7 @@ $$</p>
 <li>The hidden layers learned meaningful feature interactions automatically</li>
 </ul>
 <p><strong>Confusion Matrix:</strong></p>
-<p><img alt="Neural Network Confusion Matrix" src="../../output/confussion_NN.png"/></p>
+<p><img alt="Neural Network Confusion Matrix" src="output/confussion_NN.png"/></p>
 <p><strong>Comparison with Other Models</strong></p>
 <p>The neural network showed distinctive performance characteristics:</p>
 <ul>
@@ -8074,8 +8074,8 @@ $$</p>
 \end{array}
 $$</p>
 <p>The ROC curves reveal that Random Forest and the Conservative Ensemble achieve the highest AUC scores (above 0.93), indicating superior ability to distinguish between conflict and non-conflict cases across all classification thresholds. All models significantly outperform random classification (AUC = 0.5), with the ensemble approach successfully leveraging the diverse strengths of individual models to maintain robust discriminative power while balancing precision and recall trade-offs.</p>
-<p><img alt="ROC" src="../../output/ROC_models.png"/></p>
-<p><img alt="Precision_Recall" src="../../output/precision_Recall.png"/></p>
+<p><img alt="ROC" src="output/ROC_Models.png"/></p>
+<p><img alt="Precision_Recall" src="output/Precision_Recall.png"/></p>
 </div>
 </div>
 </div>

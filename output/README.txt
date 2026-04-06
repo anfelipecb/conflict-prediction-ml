@@ -1,4 +1,5 @@
 Figures referenced from milestones/milestone_6/final_doc.ipynb as ../../output/*.png
+The static site copies PNGs to docs/output/ so full_report.html can use paths like output/Data_Africa.png (see GitHub Actions deploy step).
 
 Generate them by running the training EDA notebooks and saving with these filenames:
   conflicts_africa_89-23.png
@@ -9,8 +10,9 @@ Generate them by running the training EDA notebooks and saving with these filena
   confusion_RF.png
   RF_Importance.png
   confusion_NN.png
-  ROC_models.png
-  precision_Recall.png
+  ROC_Models.png
+  Precision_Recall.png
+(on disk; confussion_RF / confussion_NN match the spellings above)
 
 Or add plotting cells to final_doc.ipynb that write PNGs here.
 

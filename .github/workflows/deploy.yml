@@ -54,6 +54,11 @@ jobs:
       - name: Copy full report to docs
         run: cp milestones/milestone_6/final_doc.html docs/full_report.html
 
+      - name: Copy report figures into docs (same paths as full_report.html)
+        run: |
+          mkdir -p docs/output
+          cp -f output/*.png docs/output/ 2>/dev/null || true
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
