@@ -15,6 +15,9 @@ on:
     branches: [main]
     paths:
       - "docs/**"
+      - "milestones/**"
+      - "output/**"
+      - "scripts/sync_docs_report_assets.sh"
       - "vercel.json"
       - ".github/workflows/deploy-vercel.yml"
   workflow_dispatch:

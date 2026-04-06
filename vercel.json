@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "echo 'static'",
+  "buildCommand": "bash scripts/sync_docs_report_assets.sh",
   "outputDirectory": "docs",
   "headers": [
     {

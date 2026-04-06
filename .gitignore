@@ -17,6 +17,12 @@ build/
 # Jupyter
 .ipynb_checkpoints/
 
+# Draft site variants (not deployed)
+docs/index-v2.html
+
+# Notebook-export PDF lives only under milestones/milestone_6/
+notebooks/final_doc.pdf
+
 # --- Too large for GitHub (100 MB blob limit) ---
 # UCDP GED: obtain from https://ucdp.uu.se/downloads/
 data/ucdp/GEDEvent*.csv

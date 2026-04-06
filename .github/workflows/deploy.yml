@@ -51,14 +51,8 @@ jobs:
       - name: Generate Kepler predictions JSON (optional)
         run: uv run python scripts/export_kepler_predictions.py || true
 
-      - name: Copy full report to docs
-        run: cp milestones/milestone_6/final_doc.html docs/full_report.html
-
-      - name: Copy report figures into docs (same paths as full_report.html)
-        run: |
-          mkdir -p docs/output
-          # -L follows symlinks (e.g. confusion_* -> confussion_* / LR_confussion.png)
-          cp -Lf output/*.png docs/output/ 2>/dev/null || true
+      - name: Sync full report HTML and figures into docs
+        run: bash scripts/sync_docs_report_assets.sh
 
       - name: Setup Pages
         uses: actions/configure-pages@v4

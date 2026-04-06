@@ -11,11 +11,17 @@
 
 This project investigates the predictability of violent conflict in Africa using machine learning techniques applied to satellite-derived environmental and socioeconomic data. We analyze 50km x 50km grid cells across the African continent from 2019-2023, implementing four modeling approaches to predict binary conflict occurrence.
 
+### Publication (LaTeX primary)
+
+- **Formal paper (primary PDF):** [`latex/main.tex`](latex/main.tex) and [`latex/references.bib`](latex/references.bib). Build with `latexmk -pdf main.tex` or `make -C latex` (see [`latex/README.md`](latex/README.md)).
+
+- **Supplementary:** [`milestones/milestone_6/final_doc.ipynb`](milestones/milestone_6/final_doc.ipynb) exports to HTML/PDF in [`milestones/milestone_6/`](milestones/milestone_6/). Figures live under [`output/`](output/). [`scripts/sync_docs_report_assets.sh`](scripts/sync_docs_report_assets.sh) copies the milestone HTML to [`docs/full_report.html`](docs/full_report.html) and PNGs to [`docs/output/`](docs/output/) for the static site (same step runs in **Vercel** [`buildCommand`](vercel.json) and the **GitHub Pages** [workflow](.github/workflows/deploy.yml)).
+
 ## Demo
 
 Static site source lives under [`docs/`](docs/) (same HTML for every host below).
 
-- **Live site (Vercel — climate-conflict-ml)**: **[https://climate-conflict-ml.vercel.app](https://climate-conflict-ml.vercel.app)** — production deploys from `main` via [`.github/workflows/deploy-vercel.yml`](.github/workflows/deploy-vercel.yml). The repo root [`vercel.json`](vercel.json) sets **`outputDirectory` to `docs`**, so the deployed site is the static files in [`docs/`](docs/) (where `index.html` lives). **One-time setup:** GitHub → **Settings → Secrets → Actions** → add **`VERCEL_TOKEN`** from [Vercel → Tokens](https://vercel.com/account/tokens). Manual deploy: from the **repository root**, run `vercel deploy --prod` (not from `docs/` alone). **If you see `404 NOT_FOUND`:** in the Vercel project → **Settings → General → Root Directory**, leave it **empty** (repository root) so `vercel.json` applies; do **not** set Root Directory to `docs` unless you remove the root `outputDirectory` pattern and point the project only at `docs/`.
+- **Live site (Vercel — climate-conflict-ml)**: **[https://climate-conflict-ml.vercel.app](https://climate-conflict-ml.vercel.app)** — production deploys from `main` via [`.github/workflows/deploy-vercel.yml`](.github/workflows/deploy-vercel.yml). The repo root [`vercel.json`](vercel.json) sets **`outputDirectory` to `docs`** and runs **`bash scripts/sync_docs_report_assets.sh`** before publish so `docs/full_report.html` and `docs/output/` match [`milestones/milestone_6/final_doc.html`](milestones/milestone_6/final_doc.html) and [`output/`](output/). **One-time setup:** GitHub → **Settings → Secrets → Actions** → add **`VERCEL_TOKEN`** from [Vercel → Tokens](https://vercel.com/account/tokens). Manual deploy: from the **repository root**, run `vercel deploy --prod`. **If you see `404 NOT_FOUND`:** in the Vercel project → **Settings → General → Root Directory**, leave it **empty** (repository root) so `vercel.json` applies.
 - **Live site (GitHub Pages)**: **[https://anfelipecb.github.io/conflict-prediction-ml/](https://anfelipecb.github.io/conflict-prediction-ml/)** — deployed by [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) on every push to `main`.
 
 ### Kepler input map (Viewer → Input Data)
@@ -45,7 +51,8 @@ Open [kepler.gl demo](https://kepler.gl/demo), **Add data → Load from URL**, p
 
 1. **Workflow**: [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) runs on every push to `main` (and can be run manually under **Actions → Deploy to GitHub Pages → Run workflow**).
 2. **What gets published**: The **`docs/`** folder after a short build step:
-   - Your committed static assets: `index.html`, `kepler_*.html`, `full_report.html`, `data/map/*.json`, etc.
+   - **`bash scripts/sync_docs_report_assets.sh`** copies the milestone HTML report and `output/*.png` into `docs/` (same as Vercel).
+   - Your committed static assets: `index.html`, `kepler_*.html`, `data/map/*.json`, etc.
    - **Optional refresh** of `docs/input_data.geojson` and `docs/predictions.geojson` via `scripts/generate_*.py`, and optional `docs/data/map/kepler_predictions.json` via `scripts/export_kepler_predictions.py`, when `data/output/` and `models/ensemble/` exist in the runner (if paths are missing, those steps are skipped with `|| true` and the site uses committed assets).
 3. **One-time repo setup** (if the site shows 404):
    - GitHub → **Settings → Pages**
@@ -65,50 +72,33 @@ Some artifacts exceed [GitHub’s size limits](https://docs.github.com/en/reposi
 
 ```
 project-aeyzaguirre-phernandezpedraz-afcamachob/
-├── README.md                           # This file
-├── pyproject.toml                      # UV project configuration
-├── .gitignore                          # Git ignore rules
-├── 
-├── conflict_climate/                   # Data processing modules
-│   ├── __init__.py
-│   ├── merge_data.py                   # Data merging utilities
-│   └── [other processing scripts]
-│
-├── data/                               # Data directory (large files gitignored)
-│   ├── input/                          # Raw input datasets
-│   ├── output/                         # Processed datasets
-│   │   ├── grid_conflict_climate_2019_23.parquet  # Final training dataset
-│   │   └── [visualization outputs]
-│   └── ucdp/                          # UCDP conflict data
-│
-├── milestones/                        # Project milestones and deliverables
-│   └── milestone_6/                   # Final milestone
-│       ├── final_doc.ipynb            # Final document with all analysis
-│
-├── output/                            # Generated visualizations and results
-│   ├── LR_confussion.png              # Logistic regression confusion matrix
-│   ├── KNN_confussion.png             # K-NN confusion matrix
-│   ├── confussion_RF.png             # Random Forest confusion matrix
-│   ├── confussion_NN.png             # Neural Network confusion matrix
-│   ├── ROC_models.png                # ROC curves comparison
-│   ├── precision_Recall.png          # Precision-Recall curves
-│   ├── RF_Importance.png             # Random Forest feature importance
-│   ├── conflicts_africa_89-23.png    # Historical conflict trends
-│   ├── conflicts_africa_country.png  # Conflict distribution by country
-│   └── Data_Africa.png               # Spatial data visualization
-│
-├── src/
-│   └── conflict_project/              # Python package (importable code)
-│       └── training/
-│           ├── train.py               # Training helpers
-│           └── notebooks/             # Per-model training notebooks
-│               ├── logistic_regression.ipynb
-│               ├── k_nearestneighbors.ipynb
-│               ├── random_forest.ipynb
-│               ├── neural_networks.ipynb
-│               └── comparison_models_ensemble.ipynb
-
+├── README.md
+├── pyproject.toml
+├── vercel.json                         # Static site: buildCommand syncs report → docs/
+├── latex/                              # Formal LaTeX paper (primary PDF)
+│   ├── main.tex
+│   └── references.bib
+├── docs/                               # Static site (Vercel + GitHub Pages)
+│   ├── index.html
+│   ├── full_report.html                # Copied from milestone export (see sync script)
+│   ├── kepler_input.html / kepler_predictions.html
+│   ├── output/                         # Copied from repo output/ for relative img paths
+│   └── data/map/                       # Kepler JSON / GeoJSON (large; see .gitignore)
+├── scripts/                            # Pipelines: train, Kepler export, sync_docs_report_assets.sh
+├── notebooks/                          # Extra exploration (e.g. UCDP); not the formal LaTeX paper
+├── conflict_climate/                   # Standalone data-pipeline scripts (GEE, merge, UCDP pulls)
+├── src/conflict_project/               # Python package: config, data loaders, Kepler export, training
+│   └── training/notebooks/             # Per-model + ensemble Jupyter experiments
+├── milestones/                         # Course milestones; milestone_6 = supplementary long notebook
+│   └── milestone_6/
+│       ├── final_doc.ipynb
+│       ├── final_doc.html / .pdf       # Notebook exports
+├── output/                             # Source of truth for report figures (PNG); synced into docs/output/
+├── data/                               # Processed + raw geo data (some paths gitignored)
+└── .github/workflows/                  # deploy.yml (Pages), deploy-vercel.yml
 ```
+
+**Note:** `conflict_climate/` is legacy/extraction scripts at repo root; `src/conflict_project/` is the structured package used by `scripts/` and imports. They complement each other rather than duplicate the same modules.
 
 ## Data Sources
 
@@ -176,19 +166,21 @@ This project uses UV for dependency management. To reproduce the environment:
 ## Running the Analysis
 
 ### Quick Start
-1. Navigate to `milestones/milestone_6/` for the main final document with all analysis ([`final_doc.ipynb`](milestones/milestone_6/final_doc.ipynb)).
+1. **Formal PDF:** build the LaTeX paper in [`latex/`](latex/) (`latexmk -pdf main.tex` or `make -C latex`; see [`latex/README.md`](latex/README.md)). Figures are referenced from [`output/`](output/) (see [`output/README.txt`](output/README.txt)).
 
-### Final PDF report
-After editing the notebook, export to PDF with Playwright webpdf:
+2. **Supplementary notebook:** [`milestones/milestone_6/final_doc.ipynb`](milestones/milestone_6/final_doc.ipynb) — export to PDF (Playwright webpdf):
 
 ```bash
 bash scripts/export_final_doc_pdf.sh
 ```
 
-Writes `milestones/milestone_6/final_doc.pdf` and copies to `notebooks/final_doc.pdf`. Requires a working `jupyter nbconvert` with the `webpdf` exporter and Chromium for Playwright.
+Writes **`milestones/milestone_6/final_doc.pdf` only** (canonical path for the notebook-derived PDF). Requires `jupyter nbconvert` with the `webpdf` exporter and Chromium for Playwright.
 
-### LaTeX paper (publication-style PDF)
-The [`latex/`](latex/) folder contains `main.tex`, `references.bib`, and a Makefile. Build with `latexmk -pdf main.tex` or `make -C latex` (requires TeX Live / MacTeX and `biber`). See [`latex/README.md`](latex/README.md). Figures load from [`output/`](output/) (LR/KNN matrices: `LR_confussion.png`, `KNN_confussion.png`; see [`output/README.txt`](output/README.txt)).
+3. **Sync static site report assets** (optional locally; CI runs this automatically):
+
+```bash
+bash scripts/sync_docs_report_assets.sh
+```
 
 ### Model Training
 - Individual models and ensemble comparison: [`src/conflict_project/training/notebooks/`](src/conflict_project/training/notebooks/) (e.g. `comparison_models_ensemble.ipynb`). Data path resolution uses [`src/conflict_project/repo_paths.py`](src/conflict_project/repo_paths.py) (`training_parquet_path()`), so you can run Jupyter from any working directory under the repo as long as `pyproject.toml` is discoverable upward from `Path.cwd()`.
