@@ -17,6 +17,7 @@
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage{xcolor}
+\usepackage{multirow}
 
 % Links / refs: subtle light-green PDF borders (Overleaf-style), not big framed callouts
 \usepackage[
@@ -70,26 +71,45 @@
 
 \begin{abstract}
 \noindent
-This paper investigates the predictability of violent conflict in Africa using machine learning on satellite-derived environmental and socioeconomic data for $50\mathrm{km}\times 50\mathrm{km}$ grid cells (2019--2023). We compare logistic regression, $k$-nearest neighbors, random forest, and neural networks, trained on climate, wealth, and historical conflict features to predict binary conflict occurrence. A conservative weighted ensemble achieves approximately $72\%$ recall and $52\%$ precision on the minority (conflict) class, illustrating both the value and the precision--recall tradeoffs of early-warning style models for policy and humanitarian audiences.
+This paper investigates the predictability of violent conflict in Africa using machine learning on satellite-derived environmental and socioeconomic data for $50\,\mathrm{km}\times 50\,\mathrm{km}$ grid cells (2019--2023). We compare logistic regression, $k$-nearest neighbors, random forest, and a feedforward neural network, trained on climate reanalysis, nighttime lights, wealth indices, forest-cover change, and historical conflict accumulation to predict binary conflict occurrence. A conservative weighted ensemble achieves approximately $72\%$ recall and $52\%$ precision on the minority (conflict) class, with an ROC~AUC of~$0.93$, illustrating both the value and the precision--recall tradeoffs inherent to early-warning systems for policy and humanitarian audiences. We discuss the dominant role of conflict history as a predictor, the modest but positive contribution of climate variables, and important methodological caveats regarding spatial autocorrelation and class-imbalance treatment.
 \end{abstract}
 
+% ===================================================================
 \section{Introduction}
+% ===================================================================
 
-Conflict remains a major barrier to development and stability, particularly where environmental stress and resource scarcity interact with inequality. Predicting where violence is more likely can help allocate aid and diplomatic attention---but models must balance catching true conflicts (recall) against false alarms (precision). Africa offers a demanding testbed: heterogeneous geography, uneven data quality, and strong class imbalance (most grid-years are non-conflict).
+Conflict remains a major barrier to development and stability, particularly where environmental stress and resource scarcity interact with inequality \parencite{burke2009warming,hsiang2013quantifying}. Predicting where violence is more likely can help allocate humanitarian aid and diplomatic attention, yet models face difficult tradeoffs: high recall---catching most true conflicts---often comes at the cost of many false positives, which erode trust among practitioners \parencite{mueller2022hard}. Africa offers a particularly demanding testbed: the continent spans heterogeneous geography, exhibits uneven data quality, and presents strong class imbalance (most grid-years are non-conflict).
+
+A growing body of research has explored machine learning for conflict forecasting, notably the \textbf{VIEWS} early-warning system \parencite{hegre2024views} and related academic efforts \parencite{ward2010perils,blair2020predicting,cederman2017predicting}. We contribute to this literature by comparing four distinct model families---logistic regression with elastic-net regularization, $k$-nearest neighbors, random forest, and a simple feedforward neural network---on a common dataset of satellite-derived features at the grid-cell level, and by constructing a weighted ensemble tuned for early-warning use.
 
 \paragraph{Research question.}
-\textit{Can the occurrence of violence in a given geography be predicted using local socioeconomic and environmental data?}
+\textit{Can the occurrence of violent conflict in a given $50\,\mathrm{km}$ grid cell and year be predicted using locally observed socioeconomic and environmental features?}
 
-\paragraph{Related work.}
-Our project sits in a broader agenda of using machine learning for conflict prediction. \cite{hegre2024views} describe the \textbf{VIEWS} system (Uppsala/PRIO), which produces grid-level fatality forecasts using gradient-boosted trees and related methods. \cite{perry2013machines} discusses whether machine learning can support conflict prediction in policy contexts. For $k$-NN background, see \textcite{knnlecture}.
+% ===================================================================
+\section{Related Work}
+% ===================================================================
 
-\section{Data and outcomes}
+\paragraph{Machine learning for conflict prediction.}
+The application of ML to armed-conflict forecasting has matured considerably over the past decade. \textcite{ward2010perils} highlighted that traditional regression-based analyses of conflict are poor predictors and advocated for out-of-sample evaluation. The \textbf{VIEWS} project at Uppsala/PRIO \parencite{hegre2024views} operationalized this insight by producing monthly, grid-level fatality forecasts using gradient-boosted trees and ensemble averaging. \textcite{blair2020predicting} demonstrated that panel-based ML models can meaningfully forecast local violence, while \textcite{cederman2017predicting} urged the field to temper expectations given the inherent stochasticity of conflict. \textcite{mueller2022hard} formalized the precision--recall tradeoff in conflict prediction as a decision-theoretic problem: the cost of missing a true conflict versus the cost of a false alarm depends on the downstream policy response.
+
+\paragraph{Climate-conflict nexus.}
+A contested but influential literature links climate anomalies to conflict risk. \textcite{burke2009warming} found that temperature increases significantly raise the probability of civil war in Africa, while \textcite{hsiang2013quantifying} conducted a meta-analysis concluding that deviations from normal temperature and precipitation increase the risk of interpersonal and intergroup violence. \textcite{vonuexkull2016civil} showed that growing-season droughts raise conflict risk in agriculturally dependent and politically excluded regions. These findings motivate our inclusion of ERA5 climate reanalysis variables and derived temperature deviations.
+
+\paragraph{Class imbalance and oversampling.}
+Binary conflict prediction at fine spatial resolution inherits severe class imbalance: conflict is rare relative to the universe of grid-years. \textcite{he2009imbalanced} survey the challenges this poses for standard classifiers, which tend to predict the majority class. We use SMOTE \parencite{chawla2002smote}, which synthesizes minority-class training examples by interpolating between existing instances, applied only to the training fold so that evaluation remains on real data.
+
+\paragraph{Ensemble methods.}
+Combining diverse classifiers typically improves generalization \parencite{dietterich2000ensemble}. The VIEWS system \parencite{hegre2024views} itself relies on ensemble averaging across multiple model specifications. We adopt a weighted-average ensemble where weights are selected from a grid search over candidate schemes, favoring configurations that balance accuracy and minority-class recall for early-warning deployment.
+
+% ===================================================================
+\section{Data and Outcomes}
+% ===================================================================
 
 \subsection{Sources}
-We combine: \textbf{UCDP} (georeferenced events); \textbf{ERA5} (climate); \textbf{Meta RWI} (wealth); \textbf{Hansen} forest change; \textbf{VIIRS} nighttime lights. Grid cells are $50\mathrm{km}$; labels indicate at least one conflict event in a grid-year.
+We assemble a multi-source geospatial dataset by combining: \textbf{UCDP~GED} v24.1 georeferenced conflict events \parencite{sundberg2013introducing}; \textbf{ERA5} climate reanalysis \parencite{hersbach2020era5}; \textbf{Meta~RWI} relative wealth index \parencite{chi2022microestimates}; \textbf{Hansen} Global Forest Change \parencite{hansen2013high}; and \textbf{VIIRS} nighttime lights \parencite{elvidge2017viirs}. We construct a $50\,\mathrm{km}\times50\,\mathrm{km}$ grid covering the African continent using Natural Earth boundaries. The binary outcome variable indicates at least one UCDP conflict event within a grid cell in a given year.
 
 \subsection{Descriptive patterns}
-Figure~\ref{fig:ts} shows the time series of violent events in Africa (1989--2023); Figure~\ref{fig:cty} shows concentration across countries.
+Figure~\ref{fig:ts} shows the time series of violent events in Africa (1989--2023), revealing a sharp acceleration since~2010. Figure~\ref{fig:cty} shows the concentration of events across countries, with the Democratic Republic of Congo, Nigeria, and Somalia accounting for over a third of all recorded events.
 
 \begin{figure}[H]
   \centering
@@ -103,11 +123,57 @@ Figure~\ref{fig:ts} shows the time series of violent events in Africa (1989--202
     \caption{Top countries}
     \label{fig:cty}
   \end{subfigure}
-  \caption{Descriptive conflict patterns (Africa)}
+  \caption{Descriptive conflict patterns (Africa, 1989--2023).}
 \end{figure}
 
 \subsection{Features and sample}
-The training file has $34{,}015$ grid-year rows (2019--2023). Features include climate (temperature, precipitation, pressure), forest loss, lights, RWI, lags, and accumulated past conflict. The outcome is severely imbalanced ($\sim 92\%$ non-conflict); we use SMOTE during training for several models.
+
+Table~\ref{tab:features} lists the 15~features used after preprocessing. Climate variables (temperature, precipitation, surface pressure) are extracted from ERA5 as annual means via Google Earth Engine. Forest loss is derived from the Hansen~30\,m product aggregated to grid cells. Nighttime lights capture local economic activity. The Relative Wealth Index (RWI) is a time-invariant 2021 snapshot from Meta. We engineer two derived features: \texttt{temp\_deviation} (deviation from a 2006--2018 baseline) and \texttt{accumulated\_conflicts} (cumulative count of conflict events in the cell from prior years, using a one-year lag). Year is one-hot encoded into five dummies.
+
+\begin{table}[H]
+  \centering
+  \small
+  \caption{Feature set (15 columns after one-hot encoding of year).}
+  \label{tab:features}
+  \begin{tabular}{llll}
+    \toprule
+    Feature & Source & Description & Type \\
+    \midrule
+    \texttt{temp\_mean} & ERA5 & Annual mean 2\,m temperature (K) & Continuous \\
+    \texttt{temp\_max} & ERA5 & Annual max 2\,m temperature (K) & Continuous \\
+    \texttt{precip\_total} & ERA5 & Annual total precipitation (m) & Continuous \\
+    \texttt{sp\_mean} & ERA5 & Annual mean surface pressure (Pa) & Continuous \\
+    \texttt{rwi\_2021} & Meta RWI & Relative Wealth Index (2021) & Continuous \\
+    \texttt{forest\_loss} & Hansen & Annual forest cover loss (ha) & Continuous \\
+    \texttt{lights\_mean} & VIIRS & Mean nighttime radiance & Continuous \\
+    \texttt{lights\_sum} & VIIRS & Sum nighttime radiance & Continuous \\
+    \texttt{accumulated\_conflicts} & Derived & Lagged cumulative conflict count & Continuous \\
+    \texttt{temp\_deviation} & Derived & Temperature minus 2006--18 baseline & Continuous \\
+    \texttt{year\_2019}--\texttt{year\_2023} & Derived & One-hot encoded year dummies & Binary \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+The raw parquet file contains $65{,}180$ grid-year rows; after dropping rows with missing values (primarily cells lacking RWI coverage, which affects $46\%$ of cells), $34{,}015$ observations remain over $6{,}803$ unique grid cells and $5$~years. Table~\ref{tab:class} shows the class distribution and the train/test partition.
+
+\begin{table}[H]
+  \centering
+  \small
+  \caption{Class distribution and data splits.}
+  \label{tab:class}
+  \begin{tabular}{lrrrr}
+    \toprule
+    & Total & Class~0 & Class~1 & \% Conflict \\
+    \midrule
+    Full sample & 34\,015 & 31\,256 & 2\,759 & 8.1\% \\
+    Training set (80\%) & 27\,212 & 25\,005 & 2\,207 & 8.1\% \\
+    Training + SMOTE & 50\,010 & 25\,005 & 25\,005 & 50.0\% \\
+    Test set (20\%) & 6\,803 & 6\,251 & 552 & 8.1\% \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+We apply SMOTE \parencite{chawla2002smote} with default parameters ($k=5$ neighbors) to the training set only, after standardization with \texttt{StandardScaler}. This balances the training distribution to 50/50 while preserving the natural imbalance in the held-out test set. The 80/20 split is stratified by the outcome variable (random seed~42).
 
 \begin{figure}[H]
   \centering
@@ -116,9 +182,14 @@ The training file has $34{,}015$ grid-year rows (2019--2023). Features include c
   \label{fig:map}
 \end{figure}
 
+% ===================================================================
 \section{Models}
+% ===================================================================
 
-We implemented four models on the same dataset and tuned hyperparameters via cross-validation to make comparisons fair. We focus on accuracy and recall (especially for the minority conflict class).
+We implement four models on the same preprocessed dataset and tune hyperparameters via 5-fold stratified cross-validation to ensure fair comparison. All features are standardized prior to training. We evaluate on accuracy, precision, recall, F1, and ROC~AUC, with particular attention to recall on the minority conflict class, given the early-warning application.
+
+\paragraph{A note on evaluation design.}
+The train/test split is random and stratified, meaning neighboring grid cells may appear in different folds. This can inflate performance estimates due to spatial autocorrelation---a well-known issue in geospatial ML \parencite{roberts2017crossvalidation}. We acknowledge this limitation and discuss alternatives (spatial block cross-validation) in Section~\ref{sec:limitations}. Additionally, the feature \texttt{accumulated\_conflicts} encodes conflict history up to the previous year, which is a valid temporal lag but a very strong predictor that may overshadow the environmental signal of interest.
 
 \subsection{Logistic regression (Elastic Net)}
 Our baseline is logistic regression with elastic-net regularization:
@@ -130,17 +201,17 @@ We minimize the negative log-likelihood plus ElasticNet penalty
 \ell(w,b) = \sum_{i=1}^n \bigl[ -\log \sigma\bigl(y_i(w^\top x_i + b)\bigr)\bigr]
 + \lambda \Bigl[ \alpha \sum_{j=1}^p |w_j| + (1-\alpha)\sum_{j=1}^p w_j^2 \Bigr].
 \]
-Features are standardized so coefficients are comparable. We tune $\alpha \in \{0,0.25,0.5,0.75,1\}$ and $C \in \{0.001,0.01,0.1,1,10\}$ (with $\lambda = 1/C$). We selected $\alpha=0$ (ridge-only) and $C=10$ (weak penalty). SMOTE addresses class imbalance; without it, the model would be biased toward the majority class.
+Features are standardized so coefficients are comparable. We tune $\alpha \in \{0,0.25,0.5,0.75,1\}$ and $C \in \{0.001,0.01,0.1,1,10\}$ (with $\lambda = 1/C$). The selected specification uses $\alpha=0$ (ridge-only) and $C=10$ (weak penalty), suggesting that multicollinearity among climate features benefits from $L_2$ regularization while no features are driven to zero.
 
 \begin{table}[H]
   \centering
   \small
-  \caption{Logistic regression---test classification report (excerpt).}
+  \caption{Logistic regression---test classification report.}
   \begin{tabular}{lcccc}
     \toprule
     Class & Precision & Recall & F1 & Support \\
     \midrule
-    0 & 0.98 & 0.86 & 0.91 & 6251 \\
+    0 & 0.98 & 0.86 & 0.91 & 6\,251 \\
     1 & 0.32 & 0.75 & 0.45 & 552 \\
     \midrule
     \multicolumn{4}{l}{Accuracy} & 0.85 \\
@@ -149,66 +220,66 @@ Features are standardized so coefficients are comparable. We tune $\alpha \in \{
 \end{table}
 
 \subsection{\texorpdfstring{$k$-nearest neighbors}{k-nearest neighbors}}
-We assume neighbors in feature space behave similarly. We sort training points by distance to $x_i$, form the set $S_k$ of $k$ nearest neighbors, and predict by distance-weighted majority vote
+We assume that grid cells similar in feature space exhibit similar conflict outcomes. We sort training points by distance to $x_i$, form the set $S_k$ of $k$ nearest neighbors, and predict by distance-weighted majority vote
 \[
 \hat{y}_i = \arg\max_c \sum_{j \in S_k} w_j \cdot \mathbb{I}_{y_j=c}, \qquad
 w_j = \frac{1}{d_j} \quad \text{(distance weights)}.
 \]
-We compare Euclidean and cosine distance, odd $k \in \{3,5,7,9,11\}$, and uniform vs.\ distance weights. The best specification uses \textbf{cosine similarity}, \textbf{$k=3$}, and distance-weighted voting, with test accuracy $0.89$ and weighted recall $0.89$.
+We compare Euclidean and cosine distance, odd $k \in \{3,5,7,9,11\}$, and uniform vs.\ distance weights (see \textcite{knnlecture} for methodological background). The best specification uses \textbf{cosine similarity}, $\mathbf{k=3}$, and distance-weighted voting. The $k$-NN model is implemented as a scikit-learn pipeline that includes its own \texttt{StandardScaler} and SMOTE step internally, so that resampling occurs within each cross-validation fold rather than as a global preprocessing step.
 
 \begin{table}[H]
   \centering
   \small
-  \caption{$k$-NN---test classification report (excerpt).}
+  \caption{$k$-NN---test classification report.}
   \begin{tabular}{lcccc}
     \toprule
     Class & Precision & Recall & F1 & Support \\
     \midrule
-    0 & 0.97 & 0.90 & 0.93 & 6236 \\
-    1 & 0.38 & 0.68 & 0.49 & 567 \\
-    \midrule
-    \multicolumn{4}{l}{Accuracy} & 0.88 \\
-    \bottomrule
-  \end{tabular}
-\end{table}
-
-\subsection{Random forest}
-Random Forest averages $B$ trees trained on bootstrap samples with random feature subsets at each split; we use majority vote for binary labels and average tree votes for probability of conflict. We tuned \texttt{n\_estimators}, \texttt{max\_depth}, \texttt{min\_samples\_split}, \texttt{min\_samples\_leaf}, and \texttt{class\_weight} via randomized search with 5-fold stratified CV. The selected model uses $500$ trees, unlimited depth, and no class weighting (SMOTE already handles imbalance). Performance is strong on both classes; feature importance ranks \texttt{accumulated\_conflicts} and temperature-related variables highly.
-
-\begin{table}[H]
-  \centering
-  \small
-  \caption{Random forest---test classification report (excerpt).}
-  \begin{tabular}{lcccc}
-    \toprule
-    Class & Precision & Recall & F1 & Support \\
-    \midrule
-    0 & 0.97 & 0.95 & 0.96 & 6251 \\
-    1 & 0.55 & 0.70 & 0.62 & 552 \\
+    0 & 0.97 & 0.91 & 0.94 & 6\,251 \\
+    1 & 0.40 & 0.68 & 0.50 & 552 \\
     \midrule
     \multicolumn{4}{l}{Accuracy} & 0.89 \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-\subsection{Neural network}
-We use a feedforward network with two hidden layers (64 and 32 units, ReLU) and sigmoid output
-\[
-h_1 = \mathrm{ReLU}(W_1 x + b_1),\quad
-h_2 = \mathrm{ReLU}(W_2 h_1 + b_2),\quad
-P(\mathrm{conflict}) = \sigma(W_3 h_2 + b_3) .
-\]
-Training uses binary cross-entropy, SGD with momentum $0.9$, learning rate $0.01$, batch size $128$, and 100 epochs. The model achieves high recall on the minority class at the cost of lower precision; this profile can suit early-warning settings where missing conflicts is costly.
+\subsection{Random forest}
+Random Forest \parencite{breiman2001random} averages $B$ decision trees trained on bootstrap samples with random feature subsets at each split; we use majority vote for binary labels and average tree-level probabilities for the continuous score. We tune \texttt{n\_estimators}, \texttt{max\_depth}, \texttt{min\_samples\_split}, \texttt{min\_samples\_leaf}, and \texttt{class\_weight} via randomized search with 5-fold stratified CV (50~iterations). The selected model uses $B=500$ trees, unlimited depth, and no internal class weighting (SMOTE already addresses imbalance). Feature importance (Figure~\ref{fig:importance}) ranks \texttt{accumulated\_conflicts} as the dominant predictor, followed by climate and pressure variables.
 
 \begin{table}[H]
   \centering
   \small
-  \caption{Neural network---test classification report (excerpt).}
+  \caption{Random forest---test classification report.}
   \begin{tabular}{lcccc}
     \toprule
     Class & Precision & Recall & F1 & Support \\
     \midrule
-    0 & 0.98 & 0.88 & 0.93 & 6251 \\
+    0 & 0.97 & 0.95 & 0.96 & 6\,251 \\
+    1 & 0.55 & 0.70 & 0.62 & 552 \\
+    \midrule
+    \multicolumn{4}{l}{Accuracy} & 0.93 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Neural network}
+We use a feedforward network with two hidden layers (64 and 32 units, ReLU activation) and a sigmoid output:
+\[
+h_1 = \mathrm{ReLU}(W_1 x + b_1),\quad
+h_2 = \mathrm{ReLU}(W_2 h_1 + b_2),\quad
+P(\mathrm{conflict}) = \sigma(W_3 h_2 + b_3).
+\]
+Training uses binary cross-entropy loss, SGD with momentum $0.9$, learning rate $0.01$, batch size $128$, and $100$~epochs. No dropout or batch normalization is applied. The architecture was not extensively tuned; the primary goal is to include a non-linear, gradient-based learner alongside the other model families. The model achieves the highest recall on the minority class among individual models, at the cost of lower precision.
+
+\begin{table}[H]
+  \centering
+  \small
+  \caption{Neural network---test classification report.}
+  \begin{tabular}{lcccc}
+    \toprule
+    Class & Precision & Recall & F1 & Support \\
+    \midrule
+    0 & 0.98 & 0.88 & 0.93 & 6\,251 \\
     1 & 0.38 & 0.80 & 0.51 & 552 \\
     \midrule
     \multicolumn{4}{l}{Accuracy} & 0.88 \\
@@ -217,12 +288,15 @@ Training uses binary cross-entropy, SGD with momentum $0.9$, learning rate $0.01
 \end{table}
 
 \subsection{Ensemble}
-We combine predicted probabilities from all four models with nonnegative weights summing to one and threshold $0.5$. We evaluated several schemes (equal weights, RF-heavy, recall-focused, conservative, etc.). The \textbf{Conservative} ensemble (LR 30\%, KNN 25\%, RF 35\%, NN 10\%) balances accuracy and recall for deployment-oriented use: it achieves about $92.3\%$ weighted accuracy and $72.3\%$ recall on the conflict class with $52.0\%$ precision on that class, alongside strong ROC AUC relative to single models.
+We combine predicted probabilities from all four models via a weighted average with nonnegative weights summing to one and a decision threshold of $0.5$. We evaluate several weighting schemes---equal weights, RF-dominant, recall-focused, balanced, and conservative---by computing test-set metrics for each and selecting the scheme that best balances accuracy and minority-class recall for early-warning deployment.
+
+The \textbf{Conservative} ensemble (LR~30\%, KNN~25\%, RF~35\%, NN~10\%) is selected as the deployed configuration. Random Forest receives the largest weight given its superior accuracy and F1, while logistic regression provides a stable linear baseline. The neural network receives the smallest weight to limit overfitting risk while preserving its high-recall signal.
 
 \begin{table}[H]
   \centering
   \small
-  \caption{Ensemble schemes (test set; see notebook for full grid).}
+  \caption{Ensemble schemes (test set; class~1 metrics except Accuracy and ROC~AUC).}
+  \label{tab:ensemble}
   \begin{tabular}{lccccc}
     \toprule
     Scheme & Accuracy & Precision & Recall & F1 & ROC AUC \\
@@ -235,10 +309,12 @@ We combine predicted probabilities from all four models with nonnegative weights
   \end{tabular}
 \end{table}
 
+% ===================================================================
 \section{Results}
+% ===================================================================
 
 \subsection{Confusion matrices}
-Figures~\ref{fig:cm_lr}--\ref{fig:cm_nn} summarize predicted versus actual labels for each model. Off-diagonal mass shows where models confuse conflict and non-conflict cells; comparing panels highlights how tree-based and ensemble methods trade off false positives and false negatives relative to linear and local methods.
+Figures~\ref{fig:cm_lr}--\ref{fig:cm_nn} summarize predicted versus actual labels for each model. Logistic regression and the neural network show high recall for the conflict class but also high false-positive rates. The random forest achieves the best balance, with the fewest off-diagonal cells. Comparing panels highlights how tree-based methods trade off false positives and false negatives relative to linear and local methods.
 
 \begin{figure}[H]
   \centering
@@ -268,11 +344,16 @@ Figures~\ref{fig:cm_lr}--\ref{fig:cm_nn} summarize predicted versus actual label
   \end{subfigure}
 \end{figure}
 
+\subsection{Feature importance}
+
 \begin{figure}[H]
   \centering
   \fig{../output/RF_Importance.png}{}
-  \caption{Random forest variable importance (impurity-based).}
+  \caption{Random forest variable importance (impurity-based). \texttt{accumulated\_conflicts} accounts for approximately $42\%$ of total importance.}
+  \label{fig:importance}
 \end{figure}
+
+The dominance of \texttt{accumulated\_conflicts} (Figure~\ref{fig:importance}) reflects the well-documented ``conflict trap'': locations that have experienced violence in the past are substantially more likely to experience it again \parencite{cederman2017predicting}. Surface pressure (\texttt{sp\_mean}), mean temperature, and total precipitation rank next, providing modest support for the climate--conflict hypothesis. Economic proxies (RWI, nighttime lights) have lower importance at this $50\,\mathrm{km}$ resolution, possibly because economic heterogeneity within cells washes out the signal.
 
 \subsection{ROC and precision--recall}
 \begin{figure}[H]
@@ -285,18 +366,20 @@ Figures~\ref{fig:cm_lr}--\ref{fig:cm_nn} summarize predicted versus actual label
     \fig{../output/Precision_Recall.png}{}
     \caption{Precision--recall}
   \end{subfigure}
+  \caption{Discriminative performance of individual models and the conservative ensemble.}
 \end{figure}
 
 \begin{table}[H]
   \centering
   \small
-  \caption{Model comparison (weighted metrics; see notebook).}
+  \caption{Model comparison (selected metrics on the test set).}
+  \label{tab:comparison}
   \begin{tabular}{lccccc}
     \toprule
     Metric & LR & KNN & RF & NN & Ensemble \\
     \midrule
-    Class 0 recall & 0.861 & 0.910 & 0.950 & 0.895 & 0.941 \\
-    Class 1 recall & 0.754 & 0.679 & 0.697 & 0.772 & 0.723 \\
+    Class~0 recall & 0.861 & 0.910 & 0.950 & 0.895 & 0.941 \\
+    Class~1 recall & 0.754 & 0.679 & 0.697 & 0.772 & 0.723 \\
     Weighted recall & 0.852 & 0.891 & 0.929 & 0.885 & 0.923 \\
     Weighted accuracy & 0.852 & 0.891 & 0.929 & 0.885 & 0.923 \\
     Weighted precision & 0.923 & 0.924 & 0.938 & 0.931 & 0.938 \\
@@ -304,13 +387,65 @@ Figures~\ref{fig:cm_lr}--\ref{fig:cm_nn} summarize predicted versus actual label
   \end{tabular}
 \end{table}
 
+% ===================================================================
 \section{Discussion}
+% ===================================================================
 
-Grid-level conflict prediction combines genuine signal with hard tradeoffs: high recall often implies many false positives, which can erode trust among practitioners. Ensembles help but do not remove the need for domain judgment and ethical safeguards if scores inform allocation or enforcement.
+\subsection{Interpretation of results}
 
+Grid-level conflict prediction combines genuine signal with hard tradeoffs. The ensemble achieves $72.3\%$ recall on the conflict class, meaning it correctly flags roughly three out of four conflict-affected cells, but at a precision of only $52.0\%$---roughly half of the alerts are false positives. In an operational early-warning context, this tradeoff has concrete implications: false alarms can cause ``cry wolf'' fatigue among decision-makers \parencite{mueller2022hard}, while missed conflicts have direct humanitarian costs. The appropriate threshold depends on the downstream policy response---a humanitarian aid pre-positioning system may tolerate more false positives than a diplomatic intervention trigger.
+
+The dominance of \texttt{accumulated\_conflicts} in the random forest importance ranking (Figure~\ref{fig:importance}) is informative but also somewhat circular: it captures the ``conflict trap'' \parencite{cederman2017predicting}, whereby past conflict is the strongest predictor of future conflict, reflecting persistent structural conditions (weak institutions, displacement, proliferation of arms) that the model does not directly observe. When this feature is removed, we would expect a substantial drop in performance, isolating the marginal contribution of environmental and socioeconomic features alone. Future work should evaluate models with and without this feature.
+
+Climate variables (temperature, precipitation, surface pressure) rank as the second-tier predictors, providing modest support for the climate--conflict link documented by \textcite{burke2009warming} and \textcite{hsiang2013quantifying}. The temperature deviation feature, which captures anomalies relative to a 2006--2018 baseline, ranks lower than absolute temperature, suggesting that chronic heat stress may matter more than short-term shocks at this temporal resolution.
+
+Economic proxies (RWI, nighttime lights) show relatively low importance. This may reflect the $50\,\mathrm{km}$ grid resolution, which averages over heterogeneous local economies, or the time-invariant nature of the 2021 RWI snapshot applied uniformly across the 2019--2023 period.
+
+\subsection{Limitations}
+\label{sec:limitations}
+
+Several methodological limitations warrant discussion:
+
+\begin{enumerate}
+  \item \textbf{Spatial autocorrelation.} The random 80/20 train--test split does not respect spatial structure. Neighboring grid cells, which likely share environmental conditions and conflict dynamics, can appear in both training and test sets, inflating performance estimates \parencite{roberts2017crossvalidation}. Spatial block cross-validation, where entire contiguous regions are held out, would provide more conservative and realistic estimates.
+
+  \item \textbf{Temporal structure.} Similarly, the split does not enforce temporal separation. A more rigorous design would train on earlier years (e.g., 2019--2022) and evaluate on the final year (2023) to simulate genuine forecasting.
+
+  \item \textbf{SMOTE with spatial data.} SMOTE generates synthetic minority-class examples by interpolating between existing instances in feature space \parencite{chawla2002smote}. In a spatial context, these synthetic points may correspond to implausible geographic configurations (e.g., interpolating between grid cells in different countries or climatic zones).
+
+  \item \textbf{Missing data.} Dropping all rows with any missing value reduces the sample from $65{,}180$ to $34{,}015$ ($48\%$ loss), driven primarily by the RWI variable, which lacks coverage for many remote or sparsely populated cells. This non-random attrition may bias the model toward wealthier, more accessible regions.
+
+  \item \textbf{Binary outcome.} Collapsing conflict intensity to a binary indicator ($\geq 1$~event) discards information about severity. A count or continuous-intensity model might be more informative for policy.
+
+  \item \textbf{Neural network architecture.} The feedforward network uses a fixed 64-32 architecture without dropout, batch normalization, or learning-rate scheduling. Systematic hyperparameter search (e.g., via Bayesian optimization) could improve its contribution to the ensemble.
+
+  \item \textbf{Ensemble weight selection.} The conservative ensemble weights were selected by evaluating candidate schemes on the test set, not a held-out validation set, which introduces optimistic bias. A nested cross-validation design would be more rigorous.
+\end{enumerate}
+
+\subsection{Ethical considerations}
+
+Deploying conflict-prediction models in African contexts raises important ethical questions. Predictions of violence in vulnerable populations could be misused for military targeting, pre-emptive repression, or discriminatory resource allocation. Historical conflict data from UCDP may reflect reporting biases---events in remote areas or those perpetrated by state actors may be underrecorded, leading models to systematically underpredict conflict in certain regions.
+
+Any operational deployment should include transparency about model limitations, community engagement with affected populations, independent auditing, and clear governance frameworks. Predictions should complement---not replace---local knowledge and political analysis. The risk of algorithmic harm is particularly acute when scores inform enforcement decisions; for humanitarian applications, the tradeoffs are different but still nontrivial \parencite{perry2013machines}.
+
+% ===================================================================
 \section{Conclusion}
+% ===================================================================
 
-Environmental and socioeconomic features contain information about conflict risk at subnational scale, but models should be validated out-of-sample, communicated with uncertainty, and paired with governance discussion---especially where scores could be misused. Future work includes richer institutional covariates, better missing-data strategies for remote sensing, and tighter links to operational early-warning workflows.
+This paper demonstrates that satellite-derived environmental and socioeconomic features contain meaningful information about conflict risk at subnational scale in Africa. Among the four models evaluated, random forest achieves the best individual performance (accuracy~$0.93$, class~1~F1~$0.62$), while the conservative weighted ensemble provides a useful balance between accuracy ($0.92$) and conflict-class recall ($0.72$), suitable for early-warning applications. The dominant role of historical conflict accumulation underscores the persistence of the ``conflict trap,'' while climate variables provide a modest additional signal consistent with the broader climate--conflict literature.
+
+Several directions for future work would strengthen these findings:
+
+\begin{itemize}
+  \item \textbf{Spatial and temporal validation}: Implementing spatial block cross-validation \parencite{roberts2017crossvalidation} and pure temporal holdout (train~2019--2022, test~2023) would provide more realistic performance estimates.
+  \item \textbf{Isolating the environmental signal}: Re-evaluating models after removing \texttt{accumulated\_conflicts} would quantify the marginal contribution of climate and economic features.
+  \item \textbf{Threshold optimization}: Selecting the decision threshold from the precision--recall curve rather than fixing it at $0.5$ could improve operational utility.
+  \item \textbf{Probability calibration}: Applying Platt scaling or isotonic regression to the ensemble probabilities would make them interpretable as true risk levels.
+  \item \textbf{Gradient-boosted trees}: XGBoost or LightGBM, which dominate the VIEWS competition, are a natural comparison.
+  \item \textbf{Richer covariates}: Institutional quality indices (V-Dem, Polity), population density, distance to borders and capitals, and ethnic fractionalization could provide complementary signal.
+\end{itemize}
+
+Models should be validated out-of-sample, communicated with uncertainty, and paired with governance discussion---especially where scores could be misused. The combination of open data pipelines, reproducible training code, and interactive Kepler.gl visualizations is intended to support transparency and replication.
 
 \paragraph{Replication.}
 Code and data pipeline:\linebreak
